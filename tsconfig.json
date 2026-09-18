@@ -5,9 +5,10 @@
     "strict": true,
     "lib": ["ESNext"],
 
-    "target": "esnext",
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "moduleDetection": "force",
     "forceConsistentCasingInFileNames": true,
 
     "outDir": "./dist",
