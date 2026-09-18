@@ -4,9 +4,9 @@ import type { FastifyInstance } from "fastify";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { db } from "../resources/db/client";
+import { usersTable } from "../resources/db/schema";
 import { buildApp } from "./app";
-import { db } from "./db/client";
-import { usersTable } from "./db/schema";
 
 const validBody = {
   name: "John Doe",
@@ -82,7 +82,7 @@ describe("POST /users — success", () => {
     const row = await findByEmail(validBody.email);
     expect(row.password).not.toBe(validBody.password);
     await expect(
-      bcrypt.compare(validBody.password, row.password)
+      bcrypt.compare(validBody.password, row.password),
     ).resolves.toBe(true);
   });
 
@@ -99,7 +99,7 @@ describe("POST /users — success", () => {
 
       const row = await findByEmail(validBody.email);
       expect(row.preferredMarketingChannel).toBe(channel);
-    }
+    },
   );
 });
 

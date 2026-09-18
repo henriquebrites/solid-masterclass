@@ -11,8 +11,8 @@ import {
 } from "fastify-type-provider-zod";
 import { z } from "zod/v4";
 
-import { db } from "./db/client.js";
-import { usersTable } from "./db/schema.js";
+import { db } from "../resources/db/client";
+import { usersTable } from "../resources/db/schema";
 
 export const buildApp = () => {
   const app = fastify();
