@@ -58,7 +58,7 @@ Variável de ambiente utilizada:
 
 | Variável       | Descrição                              | Exemplo (`.env.example`)                                          |
 | -------------- | --------------------------------------- | ------------------------------------------------------------------ |
-| `DATABASE_URL` | URL de conexão do PostgreSQL (Drizzle) | `postgresql://postgres:postgres@localhost:5432/solid_masterclass` |
+| `DATABASE_URL` | URL de conexão do PostgreSQL (Drizzle) | `postgresql://postgres:postgres@localhost:5433/solid_masterclass` |
 
 O `docker-compose.yml` sobe o PostgreSQL mapeando a porta do container (`5432`) para a porta `5433` do host — ajuste a porta em `DATABASE_URL` conforme o ambiente usado.
 
