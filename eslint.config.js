@@ -5,16 +5,9 @@ import simpleImportSort from "eslint-plugin-simple-import-sort";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-export default defineConfig(
+export default defineConfig([
   {
     ignores: ["dist", "node_modules"],
-  },
-
-  js.configs.recommended,
-
-  ...tseslint.configs.recommended,
-
-  {
     languageOptions: {
       globals: globals.node,
     },
@@ -29,6 +22,7 @@ export default defineConfig(
     },
     extends: ["js/recommended"],
   },
-
+  js.configs.recommended,
+  tseslint.configs.recommended,
   eslintConfigPrettier,
-);
+]);
