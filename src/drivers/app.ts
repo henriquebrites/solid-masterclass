@@ -46,7 +46,10 @@ export const buildApp = () => {
         body: z.object({
           name: z.string().trim().min(1),
           age: z.number().int().min(18).max(100),
-          phoneNumber: z.string().startsWith("+55").trim().min(1),
+          phoneNumber: z.string()
+          .trim()
+          .startsWith("+55", { message: "O número deve começar com +55" })
+          .regex(/^\+55\d{2}9?\d{8}$/, "Número de telefone inválido. Use o formato +55DD9XXXXXXXX"),
           email: z.email(),
           password: z.string().min(8),
           passwordConfirmation: z.string().min(8),
