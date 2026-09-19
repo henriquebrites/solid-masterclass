@@ -128,7 +128,7 @@ describe("POST /users — 409 e-mail already registered", () => {
 
     const res = await post({
       ...validBody,
-      phoneNumber: "+5511888888888",
+      phoneNumber: "+5511988888888",
     });
 
     expect(res.status).toBe(409);
