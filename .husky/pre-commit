@@ -1,0 +1,3 @@
+echo "[husky] pre-commit";
+
+pnpm exec lint-staged
