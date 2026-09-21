@@ -14,16 +14,18 @@
 
 Mantenha os arquivos auxiliares dos agentes em `.agents/`:
 
-| Conteúdo                | Diretório            |
-| ----------------------- | -------------------- |
-| Skills                  | `.agents/skills/`    |
-| Tarefas e checklists    | `.agents/tasks/`     |
-| Planos de implementação | `.agents/plans/`     |
-| Relatórios e análises   | `.agents/reports/`   |
-| Pesquisas e referências | `.agents/research/`  |
-| Artefatos auxiliares    | `.agents/artifacts/` |
-| Arquivos temporários    | `.agents/tmp/`       |
-| Arquivos checks         | `.agents/checks/`    |
+| Conteúdo                 | Diretório             |
+| ------------------------ | --------------------- |
+| Skills                   | `.agents/skills/`     |
+| Tarefas e checklists     | `.agents/.tasks/`     |
+| Checklists de verificação (`tlc-implement`) | `.agents/.checks/` |
+| Planos de implementação  | `.agents/plans/`      |
+| Relatórios e análises    | `.agents/reports/`    |
+| Pesquisas e referências  | `.agents/research/`   |
+| Artefatos auxiliares     | `.agents/artifacts/`  |
+| Arquivos temporários     | `.agents/tmp/`        |
+
+`.agents/.tasks/` e `.agents/.checks/` usam ponto porque são os nomes que as skills `tlc-plan` e `tlc-implement` já usam na prática (`.tasks/<name>.md` e `.checks/<feature>.md`) e que já existem no repositório. Os demais diretórios (`plans/`, `reports/`, `research/`, `artifacts/`, `tmp/`) ainda não existem e devem ser criados sob demanda, sem ponto, quando a primeira tarefa que os usa surgir.
 
 Crie os diretórios necessários quando ainda não existirem.
 
@@ -31,7 +33,7 @@ Crie os diretórios necessários quando ainda não existirem.
 
 - Código-fonte: `src/`
 - Testes: siga a estrutura de testes existente no projeto.
-- Documentação permanente: `docs/`
+- Documentação permanente: `docs/` (o diretório ainda não existe; crie-o sob demanda quando houver conteúdo para colocar nele, sem criação preventiva)
 - Arquivos compilados: `dist/`
 - Cobertura de testes: `coverage/`
 - Resultados de testes: `test-results/`
@@ -44,7 +46,7 @@ Respeite a estrutura existente. Não mova arquivos apenas para adequá-los a est
 ## Planejamento e execução
 
 - Consulte os planos e tarefas relevantes antes de iniciar uma implementação.
-- Salve novos planos em `.agents/plans/` e tarefas em `.agents/tasks/`.
+- Salve novos planos em `.agents/plans/` e tarefas/checklists em `.agents/.tasks/`.
 - Atualize os documentos relacionados quando necessário.
 - Siga as skills aplicáveis à tarefa.
 - Execute os testes e verificações pertinentes à implementação.
