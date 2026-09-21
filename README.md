@@ -1,5 +1,7 @@
 # SOLID Masterclass
 
+[![CI](https://github.com/henriquebrites/solid-masterclass/actions/workflows/ci.yml/badge.svg)](https://github.com/henriquebrites/solid-masterclass/actions/workflows/ci.yml)
+
 Projeto de estudo que aplica os princípios SOLID e Arquitetura Hexagonal (Ports & Adapters) na construção de uma API backend em Node.js e TypeScript. A aplicação expõe um endpoint de criação de usuários, demonstrando separação entre regras de negócio, adaptadores de entrada/saída e recursos externos (banco de dados e notificações).
 
 ## Tecnologias
