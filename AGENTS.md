@@ -1,5 +1,7 @@
 # AGENTS.md
 
+Instruções equivalentes para o Cursor estão em `.cursor/rules/agents.mdc`, que referencia este arquivo e `CLAUDE.md`.
+
 ## Regras gerais
 
 - A raiz do projeto é o diretório onde este arquivo está localizado.

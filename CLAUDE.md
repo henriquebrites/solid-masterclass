@@ -28,3 +28,7 @@ Ao executar uma tarefa:
 3. Nunca copie o conteúdo da skill para `.claude/skills/<nome>` — apenas o symlink deve existir ali.
 
 Observação: essa orientação indica onde estão os arquivos, mas não substitui a configuração de descoberta de skills do Claude Code.
+
+## Cursor
+
+O Cursor tem instruções equivalentes em `.cursor/rules/agents.mdc`, que referencia `AGENTS.md` e este arquivo e lista as mesmas skills por referência textual a `.agents/skills/` (o Cursor não descobre diretórios de skills via symlink, apenas arquivos `.mdc` em `.cursor/rules/` ou `AGENTS.md`).
