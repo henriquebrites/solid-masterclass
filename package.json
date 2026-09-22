@@ -2,6 +2,9 @@
   "name": "solid-masterclass",
   "main": "./dist/index.js",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch ./src/index.ts",
