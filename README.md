@@ -183,6 +183,12 @@ curl -X POST http://localhost:4949/users \
 
 ## Testes
 
+Antes de rodar a suíte, aplique as migrations no banco (mesmo passo que o CI executa):
+
+```bash
+pnpm run migrate
+```
+
 ```bash
 pnpm test
 ```
@@ -191,6 +197,7 @@ Os testes (`src/drivers/app.test.ts`) cobrem o endpoint `POST /users`, incluindo
 
 Scripts adicionais de validação, usados também em CI e nos hooks do Husky:
 
+- `pnpm run migrate` — aplica as migrations pendentes no banco (`drizzle-kit migrate`), pré-requisito para os testes de integração.
 - `pnpm run test:run` — Vitest em modo não interativo (mesmo que roda em CI e no hook `pre-push`).
 - `pnpm run test:coverage` — Vitest com relatório de cobertura.
 - `pnpm run test:types` — Vitest em modo de checagem de tipos dos próprios testes.

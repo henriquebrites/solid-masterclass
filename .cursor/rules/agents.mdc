@@ -14,6 +14,7 @@ As skills do projeto estão centralizadas em `.agents/skills/` — essa é a fon
 - `commit-message`
 - `github-readme-generator`
 - `harness-eval`
+- `open-pr`
 - `the-judge`
 - `tlc-discover`
 - `tlc-implement`
