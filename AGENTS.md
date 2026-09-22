@@ -26,10 +26,13 @@ Mantenha os arquivos auxiliares dos agentes em `.agents/`:
 | Pesquisas e referências                     | `.agents/research/`  |
 | Artefatos auxiliares                        | `.agents/artifacts/` |
 | Arquivos temporários                        | `.agents/tmp/`       |
+| Saídas do `harness-eval`                    | `.agents/.harness-eval/` |
 
-`.agents/.tasks/` e `.agents/.checks/` usam ponto porque são os nomes que as skills `tlc-plan` e `tlc-implement` já usam na prática (`.tasks/<name>.md` e `.checks/<feature>.md`) e que já existem no repositório. Os demais diretórios (`plans/`, `reports/`, `research/`, `artifacts/`, `tmp/`) ainda não existem e devem ser criados sob demanda, sem ponto, quando a primeira tarefa que os usa surgir.
+`.agents/.tasks/` e `.agents/.checks/` usam ponto porque são os nomes que as skills `tlc-plan` e `tlc-implement` já usam na prática (`.tasks/<name>.md` e `.checks/<feature>.md`) e que já existem no repositório. `.agents/.harness-eval/` usa ponto pelo mesmo motivo: é o nome que a skill `harness-eval` já usa por padrão (`.harness-eval/runs/<run-id>/`), apenas movido para dentro de `.agents/`. Os demais diretórios (`plans/`, `reports/`, `research/`, `artifacts/`, `tmp/`) ainda não existem e devem ser criados sob demanda, sem ponto, quando a primeira tarefa que os usa surgir.
 
 Crie os diretórios necessários quando ainda não existirem.
+
+A skill `harness-eval` (`.agents/skills/harness-eval/`) escreve suas saídas em `<--root>/.harness-eval/runs/<run-id>/` por padrão — para que fiquem em `.agents/.harness-eval/`, passe `--out-base .agents/.harness-eval/runs/<run-id>` para `inventory_extract.py` e `track_a_correctness.py`, e `--run-dir .agents/.harness-eval/runs/<run-id>` para os demais scripts (`surfaces_extract.py`, `merge_agreement.py`, `merge_usefulness.py`), mantendo `--root .` (raiz do repositório) para a varredura. Não altere os scripts da skill para isso.
 
 ## Arquivos da aplicação
 

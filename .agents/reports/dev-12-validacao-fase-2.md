@@ -1,6 +1,6 @@
 # DEV-12 — Validação final da configuração dos agentes (Fase 2)
 
-> Run: `harness-eval` `2026-09-22-full` (`.harness-eval/runs/2026-09-22-full/`)
+> Run: `harness-eval` `2026-09-22-full` (`.agents/.harness-eval/runs/2026-09-22-full/` — movido de `.harness-eval/` na raiz após a execução original)
 > Escopo do run: T0 (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules/agents.mdc`) + T1 (9 skills) + T2 (34 refs, incluindo docs opcionais `.github/workflows/ci.yml`, `package.json`, `tsconfig.json` por aprovação do usuário) + Track A (correção) + Track C (utilidade, dual-judge `claude-sonnet-5`).
 
 ## Critérios de aceite
@@ -40,11 +40,11 @@ Track A não teve achados BROKEN dentro do escopo de 2.1–2.5 (ver critério 2)
 | S027 | `.agents/skills/tlc-spec-driven/references/coding-principles.md` | Hold (J1=KEEP-CORE, J2=MIXED) | Divergência sobre se a seção "Writing Voice" é teoria genérica ou comportamental | **Aceito como pendência.** Fora do escopo de 2.1–2.5 (skill `tlc-spec-driven`, não tocada por esta fase). |
 | S026 | `.agents/skills/tlc-spec-driven/references/code-analysis.md` | Slim (dual) | Conselho genérico de prioridade de ferramentas (ast-grep/ripgrep/grep), sem mandato de carregamento nem conteúdo específico do repo | **Aceito como pendência.** Fora do escopo de 2.1–2.5 (skill `tlc-spec-driven`, não tocada por esta fase); nenhum fan-in bloqueado. |
 
-Nenhum dos 5 achados acima está em `AGENTS.md`, `CLAUDE.md` (exceto S001/S003, que são divergências de julgamento, não quebras) ou nos arquivos efetivamente produzidos pelas tarefas 2.1–2.5 de forma que exija correção obrigatória. Todos ficam registrados aqui e nos artefatos brutos do run (`.harness-eval/runs/2026-09-22-full/`) para decisão futura, sem bloquear o fechamento da Fase 2.
+Nenhum dos 5 achados acima está em `AGENTS.md`, `CLAUDE.md` (exceto S001/S003, que são divergências de julgamento, não quebras) ou nos arquivos efetivamente produzidos pelas tarefas 2.1–2.5 de forma que exija correção obrigatória. Todos ficam registrados aqui e nos artefatos brutos do run (`.agents/.harness-eval/runs/2026-09-22-full/`) para decisão futura, sem bloquear o fechamento da Fase 2.
 
 ## Resultado esperado (registro objetivo)
 
-Este documento, junto com `.harness-eval/runs/2026-09-22-full/` (inventário, Track A, Track C, judges, merge), constitui o registro objetivo exigido: confirma que Claude Code e Cursor localizam e seguem as instruções e skills configuradas, e que nenhum caminho citado em `AGENTS.md`/`CLAUDE.md`/`.cursor/rules/` está quebrado.
+Este documento, junto com `.agents/.harness-eval/runs/2026-09-22-full/` (inventário, Track A, Track C, judges, merge), constitui o registro objetivo exigido: confirma que Claude Code e Cursor localizam e seguem as instruções e skills configuradas, e que nenhum caminho citado em `AGENTS.md`/`CLAUDE.md`/`.cursor/rules/` está quebrado.
 
 ## Pendências
 
