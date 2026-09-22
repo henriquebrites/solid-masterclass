@@ -19,22 +19,57 @@ Projeto de estudo que aplica os princípios SOLID e Arquitetura Hexagonal (Ports
 
 ## Arquitetura do Projeto
 
-![Arquitetura Hexagonal](./.github/images/architecture.jpg)
+O projeto segue Arquitetura Hexagonal (Ports & Adapters): **Drivers → Application (Core, com as portas de saída) → Resources**, onde `resources` implementa as portas que `application` define.
 
-O projeto segue o fluxo **Drivers → Ports & Adapters → Application (Core) → Ports & Adapters → Resources**:
+```mermaid
+flowchart LR
+    subgraph Drivers["src/drivers"]
+        App["app.ts<br/>Fastify · rota POST /users"]
+    end
 
-- **Drivers** (`src/drivers`): ponto de entrada da aplicação. Contém a configuração do servidor Fastify (`app.ts`), o registro de rotas, schemas de validação (Zod) e o mapeamento de erros de negócio para respostas HTTP.
+    subgraph Application["src/application (Core)"]
+        direction TB
+        UseCases["usecases<br/>CreateUser"]
+        Entities["entities<br/>User"]
+        Errors["errors"]
+        Ports["ports<br/>UserRepository · SendNotificationStrategy · NotificationFactory"]
+    end
+
+    subgraph Resources["src/resources"]
+        Repositories["repositories<br/>UserRepositoryDrizzle"]
+        Notifications["notifications<br/>4 estratégias + SendNotificationFactory"]
+        Daos["daos<br/>UserDAO (estudo de DIP, não usado em runtime)"]
+        Db["db<br/>client · schema"]
+    end
+
+    App -->|injeta e chama| UseCases
+    UseCases --> Entities
+    UseCases --> Errors
+    UseCases -.depende de.-> Ports
+    Repositories -.implementa.-> Ports
+    Notifications -.implementa.-> Ports
+    App -->|instancia e injeta| Repositories
+    App -->|instancia e injeta| Notifications
+    Repositories --> Db
+```
+
+- **Drivers** (`src/drivers`): ponto de entrada da aplicação. Contém a configuração do servidor Fastify (`app.ts`), o registro de rotas, schemas de validação (Zod), o wiring das implementações concretas (`UserRepositoryDrizzle`, `SendNotificationFactory`) e o mapeamento de erros de negócio para respostas HTTP.
 - **Application / Core** (`src/application`): o núcleo da aplicação, independente de framework ou infraestrutura.
   - `entities`: modelos de domínio (ex.: `User`).
   - `usecases`: regras de negócio, como `CreateUser`, que orquestra validação de senha, verificação de e-mail duplicado, canal de marketing preferido e persistência do usuário.
-  - `factories`: criação de estratégias concretas a partir de um identificador, como `SendNotificationFactory`.
+  - `ports`: interfaces das portas de saída (`UserRepository`, `SendNotificationStrategy`, `NotificationFactory`) que `resources` implementa.
   - `errors`: erros de domínio específicos (`PasswordDoNotMatchError`, `EmailAlreadyExistsError`, `InvalidMarketingPreferredChannelError`, `UserCreationError`).
 - **Resources** (`src/resources`): adaptadores que conectam o núcleo a recursos externos.
   - `db`: cliente Drizzle (`client.ts`) e schema da tabela `users` (`schema.ts`).
   - `repositories`: implementação de `UserRepository` (`UserRepositoryDrizzle`) usada pelo caso de uso para persistir e consultar usuários.
-  - `notifications`: implementações do padrão Strategy (`SendEmailNotification`, `SendSMSNotification`, `SendPushNotification`, `SendWhatsAppNotification`) para envio de notificações conforme o canal escolhido.
+  - `notifications`: implementações do padrão Strategy (`SendEmailNotification`, `SendSMSNotification`, `SendPushNotification`, `SendWhatsAppNotification`) e o `SendNotificationFactory`, que resolve qual estratégia usar a partir do canal escolhido.
+  - `daos`: `UserDAO` e `UserDAODrizzle` — ver seção [Material de estudo: `UserDAO.ts`](#material-de-estudo-userdaots) abaixo.
 
-Essa organização mantém as regras de negócio (`application`) isoladas tanto da camada que recebe requisições (`drivers`) quanto da camada que acessa recursos externos (`resources`), permitindo trocar implementações (ex.: outro ORM ou canal de notificação) sem alterar o core.
+Essa organização mantém as regras de negócio (`application`) isoladas tanto da camada que recebe requisições (`drivers`) quanto da camada que acessa recursos externos (`resources`): `drivers` e `resources` dependem de `application` através das interfaces em `application/ports`, nunca o contrário, permitindo trocar implementações (ex.: outro ORM ou canal de notificação) sem alterar o core.
+
+### Material de estudo: `UserDAO.ts`
+
+`src/resources/daos/UserDAO.ts` (e sua implementação `UserDAODrizzle`) é mantido intencionalmente como material de estudo do princípio de Inversão de Dependência (DIP) do SOLID. Ele **não é usado pela aplicação em runtime** — o fluxo real de persistência usa `UserRepository` (`src/resources/repositories/UserRepository.ts`, implementando o port em `src/application/ports/UserRepository.ts`). Sua presença no código é uma decisão de produto para fins didáticos, não um resíduo a ser removido.
 
 ## Requisitos
 
@@ -154,6 +189,13 @@ pnpm test
 
 Os testes (`src/drivers/app.test.ts`) cobrem o endpoint `POST /users`, incluindo criação bem-sucedida, senha divergente (400), e-mail já cadastrado (409), erros de validação de schema (400) e erro de banco (500).
 
+Scripts adicionais de validação, usados também em CI e nos hooks do Husky:
+
+- `pnpm run test:run` — Vitest em modo não interativo (mesmo que roda em CI e no hook `pre-push`).
+- `pnpm run test:coverage` — Vitest com relatório de cobertura.
+- `pnpm run test:types` — Vitest em modo de checagem de tipos dos próprios testes.
+- `pnpm run typecheck` — checagem de tipos isolada (`tsc --noEmit`), sem gerar `dist/`.
+
 ## Lint e formatação
 
 ```bash
@@ -161,6 +203,8 @@ pnpm lint
 pnpm lint-fix
 pnpm format
 ```
+
+- `pnpm run format:check` — Prettier em modo de verificação (`--check`), sem reescrever arquivos.
 
 ## Licença
 

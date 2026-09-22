@@ -28,7 +28,7 @@ Mantenha os arquivos auxiliares dos agentes em `.agents/`:
 | Arquivos temporários                        | `.agents/tmp/`           |
 | Saídas do `harness-eval`                    | `.agents/.harness-eval/` |
 
-`.agents/.tasks/` e `.agents/.checks/` usam ponto porque são os nomes que as skills `tlc-plan` e `tlc-implement` já usam na prática (`.tasks/<name>.md` e `.checks/<feature>.md`) e que já existem no repositório. `.agents/.harness-eval/` usa ponto pelo mesmo motivo: é o nome que a skill `harness-eval` já usa por padrão (`.harness-eval/runs/<run-id>/`), apenas movido para dentro de `.agents/`. Os demais diretórios (`plans/`, `reports/`, `research/`, `artifacts/`, `tmp/`) ainda não existem e devem ser criados sob demanda, sem ponto, quando a primeira tarefa que os usa surgir.
+`.agents/.tasks/` e `.agents/.checks/` usam ponto porque são os nomes que as skills `tlc-plan` e `tlc-implement` já usam na prática (`.tasks/<name>.md` e `.checks/<feature>.md`) e que já existem no repositório. `.agents/.harness-eval/` usa ponto pelo mesmo motivo: é o nome que a skill `harness-eval` já usa por padrão (`.harness-eval/runs/<run-id>/`), apenas movido para dentro de `.agents/`. `.agents/plans/` e `.agents/reports/` já existem no repositório com conteúdo. Os demais diretórios (`research/`, `artifacts/`, `tmp/`) ainda não existem e devem ser criados sob demanda, sem ponto, quando a primeira tarefa que os usa surgir.
 
 Crie os diretórios necessários quando ainda não existirem.
 
@@ -50,17 +50,17 @@ Respeite a estrutura existente. Não mova arquivos apenas para adequá-los a est
 
 ## Arquitetura Hexagonal
 
-O projeto segue Arquitetura Hexagonal (Ports & Adapters), conforme documentado em `README.md`: **Drivers → Ports & Adapters → Application (Core) → Ports & Adapters → Resources**.
+O projeto segue Arquitetura Hexagonal (Ports & Adapters), conforme documentado em `README.md`: **Drivers → Application (Core, com as portas de saída) → Resources**, onde `resources` implementa as portas que `application` define.
 
-- **Drivers** (`src/drivers`): ponto de entrada da aplicação — servidor Fastify, registro de rotas, schemas de validação (Zod) e mapeamento de erros de negócio para respostas HTTP.
+- **Drivers** (`src/drivers`): ponto de entrada da aplicação — servidor Fastify, registro de rotas, schemas de validação (Zod), wiring das implementações concretas e mapeamento de erros de negócio para respostas HTTP.
 - **Application / Core** (`src/application`): núcleo da aplicação, independente de framework ou infraestrutura.
   - `entities`: modelos de domínio.
-  - `usecases`: regras de negócio, orquestrando validação, verificação de regras e persistência via as abstrações definidas em `resources`.
-  - `factories`: criação de estratégias concretas a partir de um identificador.
+  - `usecases`: regras de negócio, orquestrando validação, verificação de regras e persistência via as abstrações definidas em `ports`.
+  - `ports`: interfaces das portas de saída (`UserRepository`, `SendNotificationStrategy`, `NotificationFactory`) que `resources` implementa.
   - `errors`: erros de domínio específicos.
-- **Resources** (`src/resources`): adaptadores que conectam o núcleo a recursos externos (banco de dados, repositórios, notificações).
+- **Resources** (`src/resources`): adaptadores que conectam o núcleo a recursos externos (banco de dados, repositórios, notificações), implementando as interfaces definidas em `src/application/ports`.
 
-As regras de negócio (`application`) ficam isoladas tanto da camada de entrada (`drivers`) quanto da camada de acesso a recursos externos (`resources`), permitindo trocar implementações sem alterar o core. Ao adicionar código, mantenha essa direção de dependência: `drivers` e `resources` dependem de `application`, nunca o contrário.
+As regras de negócio (`application`) ficam isoladas tanto da camada de entrada (`drivers`) quanto da camada de acesso a recursos externos (`resources`), permitindo trocar implementações sem alterar o core. Ao adicionar código, mantenha essa direção de dependência: `drivers` e `resources` dependem de `application`, nunca o contrário — inclusive as interfaces de porta, que vivem em `src/application/ports`, não em `resources`. Decisões arquiteturais relevantes e difíceis de reverter são registradas em `docs/adr/`.
 
 ## Convenções de código
 
@@ -76,7 +76,7 @@ Estas convenções já são observadas no código existente e, onde aplicável, 
 
 `src/resources/daos/UserDAO.ts` é mantido intencionalmente como material de estudo do princípio de Inversão de Dependência (DIP) do SOLID. Ele não é usado pela aplicação em runtime — o fluxo real de persistência usa `UserRepository` (`src/resources/repositories/UserRepository.ts`).
 
-**Não remova, substitua ou "corrija" `UserDAO.ts` como código morto.** Sua existência é uma decisão de produto para fins didáticos, não um resíduo a ser limpo.
+**Não remova, substitua ou "corrija" `UserDAO.ts` como código morto.** Sua existência é uma decisão de produto para fins didáticos, não um resíduo a ser limpo. Ver `docs/adr/0002-preservacao-do-userdao.md`.
 
 ## Comandos de validação
 

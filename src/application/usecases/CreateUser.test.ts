@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { type UserRepository } from "../../resources/repositories/UserRepository";
 import { type User } from "../entities/User";
 import {
   EmailAlreadyExistsError,
@@ -8,6 +7,8 @@ import {
   PasswordDoNotMatchError,
   UserCreationError,
 } from "../errors";
+import { type NotificationFactory } from "../ports/NotificationFactory";
+import { type UserRepository } from "../ports/UserRepository";
 import { CreateUser } from "./CreateUser";
 
 const { sendMock, createMock } = vi.hoisted(() => ({
@@ -15,9 +16,9 @@ const { sendMock, createMock } = vi.hoisted(() => ({
   createMock: vi.fn(),
 }));
 
-vi.mock("../factories", () => ({
-  SendNotificationFactory: { create: createMock },
-}));
+const buildNotificationFactory = (): NotificationFactory => ({
+  create: createMock,
+});
 
 const validInput = {
   name: "John Doe",
@@ -48,7 +49,7 @@ beforeEach(() => {
 describe("CreateUser", () => {
   it("throws PasswordDoNotMatchError and never touches the repository when passwords differ", async () => {
     const repository = buildRepository();
-    const useCase = new CreateUser(repository);
+    const useCase = new CreateUser(repository, buildNotificationFactory());
 
     await expect(useCase.execute({ ...validInput, passwordConfirmation: "different123" })).rejects.toThrow(
       PasswordDoNotMatchError,
@@ -70,7 +71,7 @@ describe("CreateUser", () => {
         preferredMarketingChannel: "email",
       }),
     });
-    const useCase = new CreateUser(repository);
+    const useCase = new CreateUser(repository, buildNotificationFactory());
 
     await expect(useCase.execute(validInput)).rejects.toThrow(EmailAlreadyExistsError);
     expect(repository.create).not.toHaveBeenCalled();
@@ -78,7 +79,7 @@ describe("CreateUser", () => {
 
   it("throws InvalidMarketingPreferredChannelError for an unsupported channel", async () => {
     const repository = buildRepository();
-    const useCase = new CreateUser(repository);
+    const useCase = new CreateUser(repository, buildNotificationFactory());
 
     await expect(
       useCase.execute({
@@ -93,7 +94,7 @@ describe("CreateUser", () => {
     const repository = buildRepository({
       create: vi.fn().mockResolvedValue(undefined),
     });
-    const useCase = new CreateUser(repository);
+    const useCase = new CreateUser(repository, buildNotificationFactory());
 
     await expect(useCase.execute(validInput)).rejects.toThrow(UserCreationError);
     expect(sendMock).not.toHaveBeenCalled();
@@ -101,7 +102,7 @@ describe("CreateUser", () => {
 
   it("creates the user with a hashed password and returns the public fields", async () => {
     const repository = buildRepository();
-    const useCase = new CreateUser(repository);
+    const useCase = new CreateUser(repository, buildNotificationFactory());
 
     const output = await useCase.execute(validInput);
 
@@ -123,7 +124,7 @@ describe("CreateUser", () => {
 
   it("sends a notification through the channel chosen by the user", async () => {
     const repository = buildRepository();
-    const useCase = new CreateUser(repository);
+    const useCase = new CreateUser(repository, buildNotificationFactory());
 
     await useCase.execute({ ...validInput, preferredMarketingChannel: "sms" });
 
