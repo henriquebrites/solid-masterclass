@@ -50,6 +50,12 @@ jobs:
       - name: Lint
         run: pnpm exec eslint .
 
+      - name: Format check
+        run: pnpm run format:check
+
+      - name: Build
+        run: pnpm run build
+
       - name: Apply database migrations
         run: pnpm exec drizzle-kit migrate --config=drizzle.config.ts
 
