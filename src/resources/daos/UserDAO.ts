@@ -1,8 +1,8 @@
 // DAO - Data Access Object
 import { eq } from "drizzle-orm";
 
-import { db } from "../db/client";
-import { usersTable } from "../db/schema";
+import { db } from "../db/client.js";
+import { usersTable } from "../db/schema.js";
 
 // Tipos agnósticos de ORM (contrato da interface)
 export interface User {
@@ -29,10 +29,7 @@ export interface UserDAO {
 // Implementação
 export class UserDAODrizzle implements UserDAO {
   async findByEmail(email: string): Promise<User | undefined> {
-    const [existingUser] = await db
-      .select()
-      .from(usersTable)
-      .where(eq(usersTable.email, email));
+    const [existingUser] = await db.select().from(usersTable).where(eq(usersTable.email, email));
     return existingUser ? this.mapToDomain(existingUser) : undefined;
   }
 

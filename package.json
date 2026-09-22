@@ -2,14 +2,22 @@
   "name": "solid-masterclass",
   "main": "./dist/index.js",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch ./src/index.ts",
     "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:types": "vitest run --typecheck",
+    "typecheck": "tsc --noEmit",
     "start": "node ./dist/index.js",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "prepare": "husky"
   },
   "author": "Henrique Brites",
@@ -21,6 +29,7 @@
     "@types/node": "^24.13.5",
     "@types/pg": "^8.23.1",
     "@types/supertest": "^7.2.1",
+    "@vitest/coverage-v8": "^5.0.1",
     "drizzle-kit": "1.0.0-rc.4",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",

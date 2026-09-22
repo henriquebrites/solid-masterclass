@@ -16,16 +16,16 @@ Instruções equivalentes para o Cursor estão em `.cursor/rules/agents.mdc`, qu
 
 Mantenha os arquivos auxiliares dos agentes em `.agents/`:
 
-| Conteúdo                                    | Diretório            |
-| ------------------------------------------- | -------------------- |
-| Skills                                      | `.agents/skills/`    |
-| Tarefas e checklists                        | `.agents/.tasks/`    |
-| Checklists de verificação (`tlc-implement`) | `.agents/.checks/`   |
-| Planos de implementação                     | `.agents/plans/`     |
-| Relatórios e análises                       | `.agents/reports/`   |
-| Pesquisas e referências                     | `.agents/research/`  |
-| Artefatos auxiliares                        | `.agents/artifacts/` |
-| Arquivos temporários                        | `.agents/tmp/`       |
+| Conteúdo                                    | Diretório                |
+| ------------------------------------------- | ------------------------ |
+| Skills                                      | `.agents/skills/`        |
+| Tarefas e checklists                        | `.agents/.tasks/`        |
+| Checklists de verificação (`tlc-implement`) | `.agents/.checks/`       |
+| Planos de implementação                     | `.agents/plans/`         |
+| Relatórios e análises                       | `.agents/reports/`       |
+| Pesquisas e referências                     | `.agents/research/`      |
+| Artefatos auxiliares                        | `.agents/artifacts/`     |
+| Arquivos temporários                        | `.agents/tmp/`           |
 | Saídas do `harness-eval`                    | `.agents/.harness-eval/` |
 
 `.agents/.tasks/` e `.agents/.checks/` usam ponto porque são os nomes que as skills `tlc-plan` e `tlc-implement` já usam na prática (`.tasks/<name>.md` e `.checks/<feature>.md`) e que já existem no repositório. `.agents/.harness-eval/` usa ponto pelo mesmo motivo: é o nome que a skill `harness-eval` já usa por padrão (`.harness-eval/runs/<run-id>/`), apenas movido para dentro de `.agents/`. Os demais diretórios (`plans/`, `reports/`, `research/`, `artifacts/`, `tmp/`) ainda não existem e devem ser criados sob demanda, sem ponto, quando a primeira tarefa que os usa surgir.
@@ -86,6 +86,10 @@ Use os scripts já existentes em `package.json` para verificar conformidade — 
 - `pnpm format` — Prettier.
 - `pnpm test` — Vitest.
 - `pnpm build` — checagem de tipos e compilação TypeScript.
+- `pnpm run typecheck` — checagem de tipos isolada (`tsc --noEmit`), sem gerar `dist/`.
+- `pnpm run test:run` — Vitest em modo não interativo (usado em CI e no hook `pre-push`).
+- `pnpm run test:coverage` — Vitest com relatório de cobertura.
+- `pnpm run format:check` — Prettier em modo de verificação (`--check`), sem reescrever arquivos.
 
 ## Análise prévia e limites de autonomia
 

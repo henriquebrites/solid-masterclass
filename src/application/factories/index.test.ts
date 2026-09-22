@@ -21,8 +21,6 @@ describe("SendNotificationFactory", () => {
   });
 
   it("throws an error for an unsupported channel", () => {
-    expect(() => SendNotificationFactory.create("carrier-pigeon")).toThrow(
-      "Invalid channel",
-    );
+    expect(() => SendNotificationFactory.create("carrier-pigeon")).toThrow("Invalid channel");
   });
 });

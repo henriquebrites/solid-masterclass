@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  SendEmailNotification,
-  SendPushNotification,
-  SendSMSNotification,
-  SendWhatsAppNotification,
-} from "./index";
+import { SendEmailNotification, SendPushNotification, SendSMSNotification, SendWhatsAppNotification } from "./index";
 
 describe.each([
   ["email", SendEmailNotification],
