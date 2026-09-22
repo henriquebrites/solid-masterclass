@@ -1,0 +1,24 @@
+---
+description: Regras gerais do projeto e localização das skills, espelhando AGENTS.md e CLAUDE.md
+alwaysApply: true
+---
+
+# Regras do projeto para o Cursor
+
+Este projeto define suas regras gerais em `AGENTS.md` e a organização de skills em `CLAUDE.md`, ambos na raiz do repositório. Leia os dois antes de qualquer alteração — esta regra não os substitui, apenas garante que o Cursor os aplique.
+
+## Skills
+
+As skills do projeto estão centralizadas em `.agents/skills/` — essa é a fonte única, igual para todos os agentes. O Cursor não tem um mecanismo nativo de descoberta de diretório de "skills" equivalente ao `.claude/skills/` do Claude Code (regras do Cursor carregam apenas arquivos `.mdc` em `.cursor/rules/` ou um `AGENTS.md`), por isso a exposição aqui é por referência textual, nunca por symlink ou cópia:
+
+- `commit-message`
+- `github-readme-generator`
+- `harness-eval`
+- `the-judge`
+- `tlc-discover`
+- `tlc-implement`
+- `tlc-plan`
+- `tlc-spec-driven`
+- `tlc-spec-lean`
+
+Antes de executar uma tarefa, leia o `SKILL.md` da skill relevante em `.agents/skills/<nome>/SKILL.md` e siga suas instruções e critérios. Nunca copie o conteúdo de uma skill para dentro de `.cursor/`.
