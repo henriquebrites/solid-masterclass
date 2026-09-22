@@ -84,6 +84,31 @@ Use os scripts já existentes em `package.json` para verificar conformidade — 
 - `pnpm test` — Vitest.
 - `pnpm build` — checagem de tipos e compilação TypeScript.
 
+## Análise prévia e limites de autonomia
+
+Antes de propor ou implementar qualquer alteração:
+
+- Examine o código relacionado: padrões existentes, camada afetada (`drivers`, `application` ou `resources`), dependências e testes atuais.
+- Evite refatorações não relacionadas ao objetivo da tarefa em curso.
+- Apresente dúvidas relevantes e conflitos com decisões existentes ao usuário antes de implementar mudanças que dependam dessas decisões.
+
+Executáveis sem confirmação adicional:
+
+- `pnpm run lint`
+- `pnpm exec tsc --noEmit`
+- `pnpm test` (execução local, sem afetar banco real)
+- `pnpm run build`
+
+Exigem confirmação explícita do usuário, no mínimo:
+
+- Instalação ou alteração de dependências (`pnpm add`/`remove`, edição de `package.json`).
+- Qualquer `drizzle-kit migrate` fora do CI (`.github/workflows/ci.yml`) — localmente afeta o banco de desenvolvimento real.
+- Alteração de arquivos de configuração (`tsconfig.json`, `eslint.config.js`, `.prettierrc`, workflows de CI, hooks do Husky em `.husky/`).
+- Commits e push.
+- Qualquer operação destrutiva.
+
+A existência de um script em `package.json` não implica autorização automática para executá-lo. Diante de uma operação fora dos limites definidos acima, interrompa o trabalho e solicite autorização ao usuário.
+
 ## Planejamento e execução
 
 - Consulte os planos e tarefas relevantes antes de iniciar uma implementação.
