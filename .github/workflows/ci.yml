@@ -61,3 +61,6 @@ jobs:
 
       - name: Run tests
         run: pnpm run test:run
+
+      - name: Coverage report
+        run: pnpm run test:coverage
