@@ -7,6 +7,7 @@ Skills atualmente presentes (fonte em `.agents/skills/`, symlink correspondente 
 - `commit-message`
 - `github-readme-generator`
 - `harness-eval`
+- `open-pr`
 - `the-judge`
 - `tlc-discover`
 - `tlc-implement`
