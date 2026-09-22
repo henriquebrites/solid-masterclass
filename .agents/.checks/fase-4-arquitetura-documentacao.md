@@ -28,6 +28,7 @@ Toca `src/application/ports/` (novo), `src/resources/repositories/UserRepository
 | Diagrama de arquitetura passa a ser Mermaid embutido no `README.md`, substituindo `.github/images/architecture.jpg` | bloco ` ```mermaid ` dentro da seção "Arquitetura do Projeto"; a imagem `.jpg` e sua referência são removidas do README | manter o `.jpg` e redesenhá-lo - sem fonte editável no repo, não versionável/diff-ável; usuário escolheu Mermaid |
 | ADRs formalizados em `docs/adr/`, referenciados por `AGENTS.md` como local de decisões futuras | `docs/adr/0001-localizacao-das-portas-de-saida.md`, `docs/adr/0002-preservacao-do-userdao.md`, formato leve (Contexto/Decisão/Consequências) | não adotar ADRs e manter decisões só em prosa - usuário aprovou a adoção formal |
 | `eslint-plugin-boundaries` adicionado como devDependency, com regra que impede `src/application/**` de importar `src/resources/**` ou `src/drivers/**` | nova entrada em `devDependencies` do `package.json`; `elements` e `rules` em `eslint.config.js` | não adicionar a dependência e manter a regra só documentada - usuário aprovou explicitamente a nova dependência (exigido por `AGENTS.md`) |
+| `SendNotificationFactory` sai de `src/application/factories/` e passa a viver em `src/resources/notifications/SendNotificationFactory.ts`, implementando um novo port `NotificationFactory` (`src/application/ports/NotificationFactory.ts`); `CreateUser` recebe o factory via construtor (2º parâmetro), igual ao `UserRepository` | `application/ports/NotificationFactory.ts` define `interface NotificationFactory { create(channel: string): SendNotificationStrategy }`; `CreateUser(userRepository, notificationFactory)`; `app.ts` faz `new CreateUser(new UserRepositoryDrizzle(), new SendNotificationFactory())`; diretório `application/factories/` é removido | manter a Factory em `application/factories` instanciando as 4 classes concretas de `resources/notifications` diretamente - rejeitado por decisão do usuário (delegada a esta sessão como "engenheiro sênior"): viola DIP estruturalmente, é o mesmo problema que DEV-21 existe para corrigir, e o codebase já tem o padrão correto (`UserRepository`) para estender por consistência, sem abstração nova |
 
 - Nada além disso nesta mudança é difícil de reverter - o espelho da ADR no Notion é um passo adicional pedido pelo usuário, fora do repositório, e não afeta nenhuma decisão técnica tomada aqui
 
@@ -58,6 +59,18 @@ Proof: `pnpm run test:run`
 
 **C8** - `UserDAO.ts` e `UserDAODrizzle` não foram tocados
 Proof: `git diff --name-only <commit-base-da-fase-4> -- src/resources/daos/` retorna vazio
+
+**C23** - `src/application/ports/NotificationFactory.ts` exporta a interface `NotificationFactory` com um método `create(channel: string): SendNotificationStrategy`
+Proof: `grep -q "export interface NotificationFactory" src/application/ports/NotificationFactory.ts && grep -q "create(channel: string): SendNotificationStrategy" src/application/ports/NotificationFactory.ts`
+
+**C24** - `src/resources/notifications/SendNotificationFactory.ts` implementa `NotificationFactory`, e `src/application/factories/` não existe mais
+Proof: `grep -q "implements NotificationFactory" src/resources/notifications/SendNotificationFactory.ts && ! test -d src/application/factories`
+
+**C25** - `CreateUser` recebe o `NotificationFactory` via construtor, sem import estático de `SendNotificationFactory`
+Proof: `grep -q "notificationFactory" src/application/usecases/CreateUser.ts && ! grep -q "SendNotificationFactory" src/application/usecases/CreateUser.ts`
+
+**C26** - `app.ts` conecta `CreateUser` com `UserRepositoryDrizzle` e `SendNotificationFactory` (resources), sem alterar o comportamento observável do endpoint
+Proof: `grep -q "new CreateUser(new UserRepositoryDrizzle(), new SendNotificationFactory())" src/drivers/app.ts`
 
 ### S2 - Diagrama e texto de arquitetura atualizados · README.md, AGENTS.md · ~17.3 KB · ~5k
 
@@ -133,7 +146,7 @@ Proof: `pnpm lint`
 - Nenhum conjunto enumerado adicional além do que os Checks e o `Swept` acima já cobrem - as sete issues (DEV-21..27) já enumeram integralmente os critérios de aceite desta fase, e cada critério está coberto por um check ou marcado `n/a`/`existing` conforme a fonte.
 - `docs/adr/*` (2 ADRs) -> C16 (0001), C17 (0002) - ambas com proof
 - Notion mirror (2 páginas) -> C19 - única checagem manual da fase por não haver ferramenta de asserção automatizável para conteúdo do Notion
-- Claims que citam um caminho de arquivo, script ou comando concreto: C1, C2, C3, C4, C5, C6, C7, C8, C9, C11, C13, C14, C15, C16, C17, C18, C20, C21, C22 - cada um tem prova que executa o comando real ou lê o arquivo diretamente.
+- Claims que citam um caminho de arquivo, script ou comando concreto: C1, C2, C3, C4, C5, C6, C7, C8, C9, C11, C13, C14, C15, C16, C17, C18, C20, C21, C22, C23, C24, C25, C26 - cada um tem prova que executa o comando real ou lê o arquivo diretamente.
 
 ## Handoff
 
