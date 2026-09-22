@@ -16,16 +16,16 @@ Instruções equivalentes para o Cursor estão em `.cursor/rules/agents.mdc`, qu
 
 Mantenha os arquivos auxiliares dos agentes em `.agents/`:
 
-| Conteúdo                 | Diretório             |
-| ------------------------ | --------------------- |
-| Skills                   | `.agents/skills/`     |
-| Tarefas e checklists     | `.agents/.tasks/`     |
-| Checklists de verificação (`tlc-implement`) | `.agents/.checks/` |
-| Planos de implementação  | `.agents/plans/`      |
-| Relatórios e análises    | `.agents/reports/`    |
-| Pesquisas e referências  | `.agents/research/`   |
-| Artefatos auxiliares     | `.agents/artifacts/`  |
-| Arquivos temporários     | `.agents/tmp/`        |
+| Conteúdo                                    | Diretório            |
+| ------------------------------------------- | -------------------- |
+| Skills                                      | `.agents/skills/`    |
+| Tarefas e checklists                        | `.agents/.tasks/`    |
+| Checklists de verificação (`tlc-implement`) | `.agents/.checks/`   |
+| Planos de implementação                     | `.agents/plans/`     |
+| Relatórios e análises                       | `.agents/reports/`   |
+| Pesquisas e referências                     | `.agents/research/`  |
+| Artefatos auxiliares                        | `.agents/artifacts/` |
+| Arquivos temporários                        | `.agents/tmp/`       |
 
 `.agents/.tasks/` e `.agents/.checks/` usam ponto porque são os nomes que as skills `tlc-plan` e `tlc-implement` já usam na prática (`.tasks/<name>.md` e `.checks/<feature>.md`) e que já existem no repositório. Os demais diretórios (`plans/`, `reports/`, `research/`, `artifacts/`, `tmp/`) ainda não existem e devem ser criados sob demanda, sem ponto, quando a primeira tarefa que os usa surgir.
 
@@ -44,6 +44,45 @@ Crie os diretórios necessários quando ainda não existirem.
 - Arquivos de exemplo de ambiente: raiz do projeto, como `.env.example`.
 
 Respeite a estrutura existente. Não mova arquivos apenas para adequá-los a esta lista.
+
+## Arquitetura Hexagonal
+
+O projeto segue Arquitetura Hexagonal (Ports & Adapters), conforme documentado em `README.md`: **Drivers → Ports & Adapters → Application (Core) → Ports & Adapters → Resources**.
+
+- **Drivers** (`src/drivers`): ponto de entrada da aplicação — servidor Fastify, registro de rotas, schemas de validação (Zod) e mapeamento de erros de negócio para respostas HTTP.
+- **Application / Core** (`src/application`): núcleo da aplicação, independente de framework ou infraestrutura.
+  - `entities`: modelos de domínio.
+  - `usecases`: regras de negócio, orquestrando validação, verificação de regras e persistência via as abstrações definidas em `resources`.
+  - `factories`: criação de estratégias concretas a partir de um identificador.
+  - `errors`: erros de domínio específicos.
+- **Resources** (`src/resources`): adaptadores que conectam o núcleo a recursos externos (banco de dados, repositórios, notificações).
+
+As regras de negócio (`application`) ficam isoladas tanto da camada de entrada (`drivers`) quanto da camada de acesso a recursos externos (`resources`), permitindo trocar implementações sem alterar o core. Ao adicionar código, mantenha essa direção de dependência: `drivers` e `resources` dependem de `application`, nunca o contrário.
+
+## Convenções de código
+
+Estas convenções já são observadas no código existente e, onde aplicável, impostas por `eslint.config.js`, `.prettierrc`, `.editorconfig` e `tsconfig.json` (TypeScript `strict`, ESLint flat config com `simple-import-sort`, Prettier). Não as contrarie.
+
+- Classes e interfaces: `PascalCase` (ex.: `CreateUser`, `UserRepository`, `UserDAO`).
+- Nome do arquivo alinhado ao nome da classe/interface principal exportada (ex.: `UserRepository.ts` exporta `UserRepository`), exceto barris de re-exportação (`index.ts`) e arquivos que exportam valores/configuração em vez de uma classe (ex.: `app.ts`, `client.ts`, `schema.ts`), que usam nome em minúsculo.
+- Diretórios: minúsculo e plural (ex.: `entities`, `usecases`, `repositories`, `daos`).
+- Classes de erro de domínio: sufixo `Error` (ex.: `EmailAlreadyExistsError`, `UserCreationError`), definidas em `src/application/errors`.
+- Testes: arquivo `<Nome>.test.ts` colocado ao lado do código-fonte testado (ex.: `CreateUser.ts` e `CreateUser.test.ts` no mesmo diretório), usando Vitest.
+
+## Preservação de `UserDAO.ts`
+
+`src/resources/daos/UserDAO.ts` é mantido intencionalmente como material de estudo do princípio de Inversão de Dependência (DIP) do SOLID. Ele não é usado pela aplicação em runtime — o fluxo real de persistência usa `UserRepository` (`src/resources/repositories/UserRepository.ts`).
+
+**Não remova, substitua ou "corrija" `UserDAO.ts` como código morto.** Sua existência é uma decisão de produto para fins didáticos, não um resíduo a ser limpo.
+
+## Comandos de validação
+
+Use os scripts já existentes em `package.json` para verificar conformidade — não invente novos scripts:
+
+- `pnpm lint` — ESLint.
+- `pnpm format` — Prettier.
+- `pnpm test` — Vitest.
+- `pnpm build` — checagem de tipos e compilação TypeScript.
 
 ## Planejamento e execução
 
