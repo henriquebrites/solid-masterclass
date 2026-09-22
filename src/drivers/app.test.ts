@@ -6,6 +6,7 @@ import type { FastifyInstance } from "fastify";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { InvalidMarketingPreferredChannelError } from "../application/errors/index";
 import { db } from "../resources/db/client";
 import { usersTable } from "../resources/db/schema";
 import { buildApp } from "./app";
@@ -235,3 +236,19 @@ function omit<T extends Record<string, unknown>>(obj: T, key: keyof T) {
   delete clone[key];
   return clone;
 }
+
+describe("setErrorHandler — InvalidMarketingPreferredChannelError mapping", () => {
+  it("maps InvalidMarketingPreferredChannelError to 400", async () => {
+    const probeApp = buildApp();
+    probeApp.get("/__throws-invalid-channel", () => {
+      throw new InvalidMarketingPreferredChannelError();
+    });
+    await probeApp.ready();
+
+    const res = await request(probeApp.server).get("/__throws-invalid-channel");
+    await probeApp.close();
+
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: "Invalid marketing preferred channel" });
+  });
+});

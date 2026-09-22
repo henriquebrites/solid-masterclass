@@ -1,6 +1,6 @@
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
-import fastify, { type FastifyServerOptions } from "fastify";
+import fastify, { type FastifyError, type FastifyServerOptions } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { z } from "zod/v4";
@@ -33,6 +33,23 @@ export const buildApp = (options: FastifyServerOptions = {}) => {
 
   app.register(fastifySwaggerUI, {
     routePrefix: "/docs",
+  });
+
+  app.setErrorHandler((error: FastifyError, req, res) => {
+    if (error instanceof PasswordDoNotMatchError) {
+      return res.status(400).send({ error: "Passwords do not match" });
+    }
+    if (error instanceof EmailAlreadyExistsError) {
+      return res.status(409).send({ error: "E-mail já cadastrado" });
+    }
+    if (error instanceof InvalidMarketingPreferredChannelError) {
+      return res.status(400).send({ error: "Invalid marketing preferred channel" });
+    }
+    if (error.validation) {
+      return res.status(400).send({ error: error.message });
+    }
+    req.log.error(error);
+    return res.status(500).send({ error: "Erro ao criar usuário" });
   });
 
   app.after(() => {
@@ -74,23 +91,9 @@ export const buildApp = (options: FastifyServerOptions = {}) => {
         },
       },
       handler: async (req, res) => {
-        try {
-          const createUser = new CreateUser(new UserRepositoryDrizzle(), new SendNotificationFactory());
-          const output = await createUser.execute(req.body);
-          return res.status(201).send(output);
-        } catch (error) {
-          if (error instanceof PasswordDoNotMatchError) {
-            return res.status(400).send({ error: "Passwords do not match" });
-          }
-          if (error instanceof EmailAlreadyExistsError) {
-            return res.status(409).send({ error: "E-mail já cadastrado" });
-          }
-          if (error instanceof InvalidMarketingPreferredChannelError) {
-            return res.status(400).send({ error: "Invalid marketing preferred channel" });
-          }
-          req.log.error(error);
-          return res.status(500).send({ error: "Erro ao criar usuário" });
-        }
+        const createUser = new CreateUser(new UserRepositoryDrizzle(), new SendNotificationFactory());
+        const output = await createUser.execute(req.body);
+        return res.status(201).send(output);
       },
     });
   });
