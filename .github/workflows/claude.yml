@@ -44,5 +44,3 @@ jobs:
 
           claude_args: |
             --allowedTools "Bash(gh pr create:*)"
-
-          
