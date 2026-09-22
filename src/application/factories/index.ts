@@ -4,7 +4,7 @@ import {
   SendPushNotification,
   SendSMSNotification,
   SendWhatsAppNotification,
-} from "../../resources/notifications";
+} from "../../resources/notifications/index.js";
 
 export class SendNotificationFactory {
   static create(channel: string): SendNotificationStrategy {

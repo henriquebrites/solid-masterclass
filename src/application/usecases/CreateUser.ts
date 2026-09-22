@@ -1,13 +1,13 @@
 import bcrypt from "bcrypt";
 
-import { type UserRepository } from "../../resources/repositories/UserRepository";
+import { type UserRepository } from "../../resources/repositories/UserRepository.js";
 import {
   EmailAlreadyExistsError,
   InvalidMarketingPreferredChannelError,
   PasswordDoNotMatchError,
   UserCreationError,
-} from "../errors";
-import { SendNotificationFactory } from "../factories";
+} from "../errors/index.js";
+import { SendNotificationFactory } from "../factories/index.js";
 
 interface InputDTO {
   name: string;
@@ -39,11 +39,7 @@ export class CreateUser {
     if (existingUser) {
       throw new EmailAlreadyExistsError();
     }
-    if (
-      !["email", "sms", "push", "whatsapp"].includes(
-        input.preferredMarketingChannel,
-      )
-    ) {
+    if (!["email", "sms", "push", "whatsapp"].includes(input.preferredMarketingChannel)) {
       throw new InvalidMarketingPreferredChannelError();
     }
     const user = await this.userRepository.create({
@@ -58,9 +54,7 @@ export class CreateUser {
     if (!user) {
       throw new UserCreationError();
     }
-    await SendNotificationFactory.create(
-      input.preferredMarketingChannel,
-    ).send();
+    await SendNotificationFactory.create(input.preferredMarketingChannel).send();
     return {
       id: user.id,
       name: user.name,

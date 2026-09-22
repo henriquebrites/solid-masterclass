@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 
-import { type User } from "../../application/entities/User";
-import { db } from "../db/client";
-import { usersTable } from "../db/schema";
+import { type User } from "../../application/entities/User.js";
+import { db } from "../db/client.js";
+import { usersTable } from "../db/schema.js";
 
 export interface UserRepository {
   findByEmail(email: string): Promise<User | null>;
@@ -11,10 +11,7 @@ export interface UserRepository {
 
 export class UserRepositoryDrizzle implements UserRepository {
   async findByEmail(email: string): Promise<User | null> {
-    const [existingUser] = await db
-      .select()
-      .from(usersTable)
-      .where(eq(usersTable.email, email));
+    const [existingUser] = await db.select().from(usersTable).where(eq(usersTable.email, email));
     return existingUser;
   }
   async create(user: User): Promise<User> {

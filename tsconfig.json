@@ -6,8 +6,8 @@
     "lib": ["ESNext"],
 
     "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "moduleDetection": "force",
     "forceConsistentCasingInFileNames": true,
 
