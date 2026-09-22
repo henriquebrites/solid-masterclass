@@ -1,3 +1,6 @@
+import fastifyCors from "@fastify/cors";
+import fastifyHelmet from "@fastify/helmet";
+import fastifyRateLimit from "@fastify/rate-limit";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
 import fastify, { type FastifyError, type FastifyServerOptions } from "fastify";
@@ -14,10 +17,18 @@ import { CreateUser } from "../application/usecases/CreateUser.js";
 import { SendNotificationFactory } from "../resources/notifications/SendNotificationFactory.js";
 import { UserRepositoryDrizzle } from "../resources/repositories/UserRepository.js";
 
-export const buildApp = (options: FastifyServerOptions = {}) => {
+interface BuildAppOptions extends FastifyServerOptions {
+  usersRateLimit?: { max: number; timeWindow: string };
+}
+
+export const buildApp = ({ usersRateLimit = { max: 5, timeWindow: "1 minute" }, ...options }: BuildAppOptions = {}) => {
   const app = fastify({ logger: true, ...options });
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
+
+  app.register(fastifyHelmet);
+  app.register(fastifyCors, { origin: false });
+  app.register(fastifyRateLimit, { global: false });
 
   app.register(fastifySwagger, {
     openapi: {
@@ -45,8 +56,8 @@ export const buildApp = (options: FastifyServerOptions = {}) => {
     if (error instanceof InvalidMarketingPreferredChannelError) {
       return res.status(400).send({ error: "Invalid marketing preferred channel" });
     }
-    if (error.validation) {
-      return res.status(400).send({ error: error.message });
+    if (typeof error.statusCode === "number" && error.statusCode < 500) {
+      return res.status(error.statusCode).send({ error: error.message });
     }
     req.log.error(error);
     return res.status(500).send({ error: "Erro ao criar usuário" });
@@ -56,6 +67,9 @@ export const buildApp = (options: FastifyServerOptions = {}) => {
     app.withTypeProvider<ZodTypeProvider>().route({
       method: "POST",
       url: "/users",
+      config: {
+        rateLimit: usersRateLimit,
+      },
       schema: {
         body: z.object({
           name: z.string().trim().min(1),

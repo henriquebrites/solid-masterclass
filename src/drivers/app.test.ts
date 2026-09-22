@@ -24,7 +24,7 @@ const validBody = {
 let app: FastifyInstance;
 
 beforeAll(async () => {
-  app = await buildApp();
+  app = await buildApp({ usersRateLimit: { max: 100_000, timeWindow: "1 minute" } });
   await app.ready();
 });
 
@@ -236,6 +236,42 @@ function omit<T extends Record<string, unknown>>(obj: T, key: keyof T) {
   delete clone[key];
   return clone;
 }
+
+describe("HTTP hardening", () => {
+  it("includes helmet security headers", async () => {
+    const res = await post(validBody);
+
+    expect(res.headers["x-content-type-options"]).toBe("nosniff");
+  });
+
+  it("does not reflect any origin in Access-Control-Allow-Origin", async () => {
+    const res = await request(app.server)
+      .post("/users")
+      .set("Origin", "https://evil.example.com")
+      .send(validBody as object);
+
+    expect(res.headers["access-control-allow-origin"]).toBeUndefined();
+  });
+
+  it("returns 429 after 5 requests per minute from the same IP", async () => {
+    const probeApp = buildApp();
+    await probeApp.ready();
+    const postToProbe = (body: unknown) =>
+      request(probeApp.server)
+        .post("/users")
+        .send(body as object);
+
+    for (let i = 0; i < 5; i += 1) {
+      const res = await postToProbe({ ...validBody, email: `user${i}@example.com` });
+      expect(res.status).not.toBe(429);
+    }
+    const res = await postToProbe({ ...validBody, email: "user5@example.com" });
+
+    await probeApp.close();
+
+    expect(res.status).toBe(429);
+  });
+});
 
 describe("setErrorHandler — InvalidMarketingPreferredChannelError mapping", () => {
   it("maps InvalidMarketingPreferredChannelError to 400", async () => {
