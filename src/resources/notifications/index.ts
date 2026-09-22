@@ -1,8 +1,4 @@
-// Strategy Pattern
-
-export interface SendNotificationStrategy {
-  send(): Promise<void>;
-}
+import { type SendNotificationStrategy } from "../../application/ports/SendNotificationStrategy.js";
 
 export class SendWhatsAppNotification implements SendNotificationStrategy {
   async send(): Promise<void> {

@@ -1,13 +1,9 @@
 import { eq } from "drizzle-orm";
 
 import { type User } from "../../application/entities/User.js";
+import { type UserRepository } from "../../application/ports/UserRepository.js";
 import { db } from "../db/client.js";
 import { usersTable } from "../db/schema.js";
-
-export interface UserRepository {
-  findByEmail(email: string): Promise<User | null>;
-  create(user: User): Promise<User>;
-}
 
 export class UserRepositoryDrizzle implements UserRepository {
   async findByEmail(email: string): Promise<User | null> {

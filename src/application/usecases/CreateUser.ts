@@ -1,13 +1,13 @@
 import bcrypt from "bcrypt";
 
-import { type UserRepository } from "../../resources/repositories/UserRepository.js";
 import {
   EmailAlreadyExistsError,
   InvalidMarketingPreferredChannelError,
   PasswordDoNotMatchError,
   UserCreationError,
 } from "../errors/index.js";
-import { SendNotificationFactory } from "../factories/index.js";
+import { type NotificationFactory } from "../ports/NotificationFactory.js";
+import { type UserRepository } from "../ports/UserRepository.js";
 
 interface InputDTO {
   name: string;
@@ -29,7 +29,10 @@ interface OutputDTO {
 }
 
 export class CreateUser {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private notificationFactory: NotificationFactory,
+  ) {}
 
   async execute(input: InputDTO): Promise<OutputDTO> {
     if (input.password !== input.passwordConfirmation) {
@@ -54,7 +57,7 @@ export class CreateUser {
     if (!user) {
       throw new UserCreationError();
     }
-    await SendNotificationFactory.create(input.preferredMarketingChannel).send();
+    await this.notificationFactory.create(input.preferredMarketingChannel).send();
     return {
       id: user.id,
       name: user.name,

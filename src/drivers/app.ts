@@ -11,6 +11,7 @@ import {
   PasswordDoNotMatchError,
 } from "../application/errors/index.js";
 import { CreateUser } from "../application/usecases/CreateUser.js";
+import { SendNotificationFactory } from "../resources/notifications/SendNotificationFactory.js";
 import { UserRepositoryDrizzle } from "../resources/repositories/UserRepository.js";
 
 export const buildApp = () => {
@@ -74,7 +75,7 @@ export const buildApp = () => {
       },
       handler: async (req, res) => {
         try {
-          const createUser = new CreateUser(new UserRepositoryDrizzle());
+          const createUser = new CreateUser(new UserRepositoryDrizzle(), new SendNotificationFactory());
           const output = await createUser.execute(req.body);
           return res.status(201).send(output);
         } catch (error) {
