@@ -209,3 +209,5 @@ pnpm format
 ## Licença
 
 ISC, conforme declarado no `package.json`.
+
+Feito com 💜 por [Henrique Brites](https://github.com/henriquebrites) 👋
