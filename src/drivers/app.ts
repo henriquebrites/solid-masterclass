@@ -22,7 +22,7 @@ interface BuildAppOptions extends FastifyServerOptions {
 }
 
 export const buildApp = ({ usersRateLimit = { max: 5, timeWindow: "1 minute" }, ...options }: BuildAppOptions = {}) => {
-  const app = fastify({ logger: true, ...options });
+  const app = fastify({ logger: { level: "warn" }, ...options });
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
 
