@@ -32,6 +32,8 @@ Mantenha os arquivos auxiliares dos agentes em `.agents/`:
 
 Crie os diretórios necessários quando ainda não existirem.
 
+Diretórios de saída de LLM/skill cujo nome comece com ponto (ex.: `.design/`, `.tasks/`) devem ser criados dentro de `.agents/` (ex.: `.agents/.design/<nome>.md`), nunca na raiz do projeto — isso não se aplica a diretórios de ferramentas/configuração já existentes (`.git/`, `.vscode/`, `.cursor/`, `.husky/`, etc.), que permanecem onde estão. Sempre que um diretório novo desse tipo for criado, atualize esta tabela com a entrada correspondente.
+
 A skill `harness-eval` (`.agents/skills/harness-eval/`) escreve suas saídas em `<--root>/.harness-eval/runs/<run-id>/` por padrão — para que fiquem em `.agents/.harness-eval/`, passe `--out-base .agents/.harness-eval/runs/<run-id>` para `inventory_extract.py` e `track_a_correctness.py`, e `--run-dir .agents/.harness-eval/runs/<run-id>` para os demais scripts (`surfaces_extract.py`, `merge_agreement.py`, `merge_usefulness.py`), mantendo `--root .` (raiz do repositório) para a varredura. Não altere os scripts da skill para isso.
 
 ## Arquivos da aplicação

@@ -1,9 +1,12 @@
+import { Writable } from "node:stream";
+
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { InvalidMarketingPreferredChannelError } from "../application/errors/index";
 import { db } from "../resources/db/client";
 import { usersTable } from "../resources/db/schema";
 import { buildApp } from "./app";
@@ -21,7 +24,7 @@ const validBody = {
 let app: FastifyInstance;
 
 beforeAll(async () => {
-  app = await buildApp();
+  app = await buildApp({ usersRateLimit: { max: 100_000, timeWindow: "1 minute" } });
   await app.ready();
 });
 
@@ -152,7 +155,55 @@ describe("POST /users — 500 internal error", () => {
     expect(res.status).toBe(500);
     expect(res.body).toEqual({ error: "Erro ao criar usuário" });
   });
+
+  it("logs the original error before responding 500", async () => {
+    const { app: loggedApp, logs, teardown } = await withCapturedLogs();
+    const postToLoggedApp = (body: unknown) =>
+      request(loggedApp.server)
+        .post("/users")
+        .send(body as object);
+
+    const first = await postToLoggedApp(validBody);
+    expect(first.status).toBe(201);
+
+    await postToLoggedApp({ ...validBody, email: "jane@example.com" });
+    await teardown();
+
+    expect(logs.some((line) => line.includes('"level":50'))).toBe(true);
+  });
 });
+
+describe("logging", () => {
+  it("logs a structured line for a request", async () => {
+    const { app: loggedApp, logs, teardown } = await withCapturedLogs();
+
+    await request(loggedApp.server)
+      .post("/users")
+      .send(validBody as object);
+    await teardown();
+
+    expect(logs.some((line) => line.includes("incoming request"))).toBe(true);
+  });
+});
+
+async function withCapturedLogs() {
+  const chunks: string[] = [];
+  const stream = new Writable({
+    write(chunk: Buffer, _encoding: BufferEncoding, callback: () => void) {
+      chunks.push(chunk.toString());
+      callback();
+    },
+  });
+
+  const loggedApp = buildApp({ logger: { stream, level: "info" } });
+  await loggedApp.ready();
+
+  return {
+    app: loggedApp,
+    logs: chunks,
+    teardown: () => loggedApp.close(),
+  };
+}
 
 describe("POST /users — 400 schema validation", () => {
   const cases: Array<[string, Record<string, unknown>]> = [
@@ -185,3 +236,55 @@ function omit<T extends Record<string, unknown>>(obj: T, key: keyof T) {
   delete clone[key];
   return clone;
 }
+
+describe("HTTP hardening", () => {
+  it("includes helmet security headers", async () => {
+    const res = await post(validBody);
+
+    expect(res.headers["x-content-type-options"]).toBe("nosniff");
+  });
+
+  it("does not reflect any origin in Access-Control-Allow-Origin", async () => {
+    const res = await request(app.server)
+      .post("/users")
+      .set("Origin", "https://evil.example.com")
+      .send(validBody as object);
+
+    expect(res.headers["access-control-allow-origin"]).toBeUndefined();
+  });
+
+  it("returns 429 after 5 requests per minute from the same IP", async () => {
+    const probeApp = buildApp();
+    await probeApp.ready();
+    const postToProbe = (body: unknown) =>
+      request(probeApp.server)
+        .post("/users")
+        .send(body as object);
+
+    for (let i = 0; i < 5; i += 1) {
+      const res = await postToProbe({ ...validBody, email: `user${i}@example.com` });
+      expect(res.status).not.toBe(429);
+    }
+    const res = await postToProbe({ ...validBody, email: "user5@example.com" });
+
+    await probeApp.close();
+
+    expect(res.status).toBe(429);
+  });
+});
+
+describe("setErrorHandler — InvalidMarketingPreferredChannelError mapping", () => {
+  it("maps InvalidMarketingPreferredChannelError to 400", async () => {
+    const probeApp = buildApp();
+    probeApp.get("/__throws-invalid-channel", () => {
+      throw new InvalidMarketingPreferredChannelError();
+    });
+    await probeApp.ready();
+
+    const res = await request(probeApp.server).get("/__throws-invalid-channel");
+    await probeApp.close();
+
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: "Invalid marketing preferred channel" });
+  });
+});

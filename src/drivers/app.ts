@@ -1,6 +1,9 @@
+import fastifyCors from "@fastify/cors";
+import fastifyHelmet from "@fastify/helmet";
+import fastifyRateLimit from "@fastify/rate-limit";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
-import fastify from "fastify";
+import fastify, { type FastifyError, type FastifyServerOptions } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { z } from "zod/v4";
@@ -14,10 +17,18 @@ import { CreateUser } from "../application/usecases/CreateUser.js";
 import { SendNotificationFactory } from "../resources/notifications/SendNotificationFactory.js";
 import { UserRepositoryDrizzle } from "../resources/repositories/UserRepository.js";
 
-export const buildApp = () => {
-  const app = fastify();
+interface BuildAppOptions extends FastifyServerOptions {
+  usersRateLimit?: { max: number; timeWindow: string };
+}
+
+export const buildApp = ({ usersRateLimit = { max: 5, timeWindow: "1 minute" }, ...options }: BuildAppOptions = {}) => {
+  const app = fastify({ logger: { level: "warn" }, ...options });
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
+
+  app.register(fastifyHelmet);
+  app.register(fastifyCors, { origin: false });
+  app.register(fastifyRateLimit, { global: false });
 
   app.register(fastifySwagger, {
     openapi: {
@@ -35,10 +46,30 @@ export const buildApp = () => {
     routePrefix: "/docs",
   });
 
+  app.setErrorHandler((error: FastifyError, req, res) => {
+    if (error instanceof PasswordDoNotMatchError) {
+      return res.status(400).send({ error: "Passwords do not match" });
+    }
+    if (error instanceof EmailAlreadyExistsError) {
+      return res.status(409).send({ error: "E-mail já cadastrado" });
+    }
+    if (error instanceof InvalidMarketingPreferredChannelError) {
+      return res.status(400).send({ error: "Invalid marketing preferred channel" });
+    }
+    if (typeof error.statusCode === "number" && error.statusCode < 500) {
+      return res.status(error.statusCode).send({ error: error.message });
+    }
+    req.log.error(error);
+    return res.status(500).send({ error: "Erro ao criar usuário" });
+  });
+
   app.after(() => {
     app.withTypeProvider<ZodTypeProvider>().route({
       method: "POST",
       url: "/users",
+      config: {
+        rateLimit: usersRateLimit,
+      },
       schema: {
         body: z.object({
           name: z.string().trim().min(1),
@@ -74,22 +105,9 @@ export const buildApp = () => {
         },
       },
       handler: async (req, res) => {
-        try {
-          const createUser = new CreateUser(new UserRepositoryDrizzle(), new SendNotificationFactory());
-          const output = await createUser.execute(req.body);
-          return res.status(201).send(output);
-        } catch (error) {
-          if (error instanceof PasswordDoNotMatchError) {
-            return res.status(400).send({ error: "Passwords do not match" });
-          }
-          if (error instanceof EmailAlreadyExistsError) {
-            return res.status(409).send({ error: "E-mail já cadastrado" });
-          }
-          if (error instanceof InvalidMarketingPreferredChannelError) {
-            return res.status(400).send({ error: "Invalid marketing preferred channel" });
-          }
-          return res.status(500).send({ error: "Erro ao criar usuário" });
-        }
+        const createUser = new CreateUser(new UserRepositoryDrizzle(), new SendNotificationFactory());
+        const output = await createUser.execute(req.body);
+        return res.status(201).send(output);
       },
     });
   });
