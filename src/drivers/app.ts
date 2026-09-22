@@ -1,6 +1,6 @@
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
-import fastify from "fastify";
+import fastify, { type FastifyServerOptions } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { z } from "zod/v4";
@@ -14,8 +14,8 @@ import { CreateUser } from "../application/usecases/CreateUser.js";
 import { SendNotificationFactory } from "../resources/notifications/SendNotificationFactory.js";
 import { UserRepositoryDrizzle } from "../resources/repositories/UserRepository.js";
 
-export const buildApp = () => {
-  const app = fastify();
+export const buildApp = (options: FastifyServerOptions = {}) => {
+  const app = fastify({ logger: true, ...options });
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
 
@@ -88,6 +88,7 @@ export const buildApp = () => {
           if (error instanceof InvalidMarketingPreferredChannelError) {
             return res.status(400).send({ error: "Invalid marketing preferred channel" });
           }
+          req.log.error(error);
           return res.status(500).send({ error: "Erro ao criar usuário" });
         }
       },

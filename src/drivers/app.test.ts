@@ -1,3 +1,5 @@
+import { Writable } from "node:stream";
+
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
@@ -152,7 +154,55 @@ describe("POST /users — 500 internal error", () => {
     expect(res.status).toBe(500);
     expect(res.body).toEqual({ error: "Erro ao criar usuário" });
   });
+
+  it("logs the original error before responding 500", async () => {
+    const { app: loggedApp, logs, teardown } = await withCapturedLogs();
+    const postToLoggedApp = (body: unknown) =>
+      request(loggedApp.server)
+        .post("/users")
+        .send(body as object);
+
+    const first = await postToLoggedApp(validBody);
+    expect(first.status).toBe(201);
+
+    await postToLoggedApp({ ...validBody, email: "jane@example.com" });
+    await teardown();
+
+    expect(logs.some((line) => line.includes('"level":50'))).toBe(true);
+  });
 });
+
+describe("logging", () => {
+  it("logs a structured line for a request", async () => {
+    const { app: loggedApp, logs, teardown } = await withCapturedLogs();
+
+    await request(loggedApp.server)
+      .post("/users")
+      .send(validBody as object);
+    await teardown();
+
+    expect(logs.some((line) => line.includes("incoming request"))).toBe(true);
+  });
+});
+
+async function withCapturedLogs() {
+  const chunks: string[] = [];
+  const stream = new Writable({
+    write(chunk: Buffer, _encoding: BufferEncoding, callback: () => void) {
+      chunks.push(chunk.toString());
+      callback();
+    },
+  });
+
+  const loggedApp = buildApp({ logger: { stream, level: "info" } });
+  await loggedApp.ready();
+
+  return {
+    app: loggedApp,
+    logs: chunks,
+    teardown: () => loggedApp.close(),
+  };
+}
 
 describe("POST /users — 400 schema validation", () => {
   const cases: Array<[string, Record<string, unknown>]> = [
