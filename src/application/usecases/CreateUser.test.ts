@@ -34,13 +34,9 @@ type MockedUserRepository = {
   create: ReturnType<typeof vi.fn<UserRepository["create"]>>;
 };
 
-const buildRepository = (
-  overrides: Partial<MockedUserRepository> = {},
-): MockedUserRepository => ({
+const buildRepository = (overrides: Partial<MockedUserRepository> = {}): MockedUserRepository => ({
   findByEmail: vi.fn<UserRepository["findByEmail"]>().mockResolvedValue(null),
-  create: vi
-    .fn<UserRepository["create"]>()
-    .mockImplementation((user: User) => Promise.resolve(user)),
+  create: vi.fn<UserRepository["create"]>().mockImplementation((user: User) => Promise.resolve(user)),
   ...overrides,
 });
 
@@ -54,9 +50,9 @@ describe("CreateUser", () => {
     const repository = buildRepository();
     const useCase = new CreateUser(repository);
 
-    await expect(
-      useCase.execute({ ...validInput, passwordConfirmation: "different123" }),
-    ).rejects.toThrow(PasswordDoNotMatchError);
+    await expect(useCase.execute({ ...validInput, passwordConfirmation: "different123" })).rejects.toThrow(
+      PasswordDoNotMatchError,
+    );
 
     expect(repository.findByEmail).not.toHaveBeenCalled();
     expect(repository.create).not.toHaveBeenCalled();
@@ -76,9 +72,7 @@ describe("CreateUser", () => {
     });
     const useCase = new CreateUser(repository);
 
-    await expect(useCase.execute(validInput)).rejects.toThrow(
-      EmailAlreadyExistsError,
-    );
+    await expect(useCase.execute(validInput)).rejects.toThrow(EmailAlreadyExistsError);
     expect(repository.create).not.toHaveBeenCalled();
   });
 
@@ -101,9 +95,7 @@ describe("CreateUser", () => {
     });
     const useCase = new CreateUser(repository);
 
-    await expect(useCase.execute(validInput)).rejects.toThrow(
-      UserCreationError,
-    );
+    await expect(useCase.execute(validInput)).rejects.toThrow(UserCreationError);
     expect(sendMock).not.toHaveBeenCalled();
   });
 

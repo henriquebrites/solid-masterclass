@@ -39,10 +39,7 @@ const post = (body: unknown) =>
     .send(body as object);
 
 const findByEmail = async (email: string) => {
-  const [row] = await db
-    .select()
-    .from(usersTable)
-    .where(eq(usersTable.email, email));
+  const [row] = await db.select().from(usersTable).where(eq(usersTable.email, email));
   return row;
 };
 
@@ -81,9 +78,7 @@ describe("POST /users — success", () => {
 
     const row = await findByEmail(validBody.email);
     expect(row.password).not.toBe(validBody.password);
-    await expect(
-      bcrypt.compare(validBody.password, row.password),
-    ).resolves.toBe(true);
+    await expect(bcrypt.compare(validBody.password, row.password)).resolves.toBe(true);
   });
 
   it.each(["email", "sms", "push", "whatsapp"] as const)(
@@ -165,29 +160,14 @@ describe("POST /users — 400 schema validation", () => {
     ["name empty", { ...validBody, name: "   " }],
     ["age below 12", { ...validBody, age: 11 }],
     ["age not a number", { ...validBody, age: "20" }],
-    [
-      "phoneNumber missing the +55 prefix",
-      { ...validBody, phoneNumber: "11999999999" },
-    ],
+    ["phoneNumber missing the +55 prefix", { ...validBody, phoneNumber: "11999999999" }],
     ["phoneNumber empty", { ...validBody, phoneNumber: "" }],
     ["email invalid", { ...validBody, email: "not-an-email" }],
     ["email missing", omit(validBody, "email")],
-    [
-      "password shorter than 8",
-      { ...validBody, password: "short", passwordConfirmation: "short" },
-    ],
-    [
-      "passwordConfirmation shorter than 8",
-      { ...validBody, passwordConfirmation: "short" },
-    ],
-    [
-      "preferredMarketingChannel invalid",
-      { ...validBody, preferredMarketingChannel: "carrier-pigeon" },
-    ],
-    [
-      "preferredMarketingChannel missing",
-      omit(validBody, "preferredMarketingChannel"),
-    ],
+    ["password shorter than 8", { ...validBody, password: "short", passwordConfirmation: "short" }],
+    ["passwordConfirmation shorter than 8", { ...validBody, passwordConfirmation: "short" }],
+    ["preferredMarketingChannel invalid", { ...validBody, preferredMarketingChannel: "carrier-pigeon" }],
+    ["preferredMarketingChannel missing", omit(validBody, "preferredMarketingChannel")],
     ["empty body", {}],
   ];
 

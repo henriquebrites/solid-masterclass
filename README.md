@@ -59,7 +59,7 @@ cp .env.example .env
 Variável de ambiente utilizada:
 
 | Variável       | Descrição                              | Exemplo (`.env.example`)                                          |
-| -------------- | --------------------------------------- | ------------------------------------------------------------------ |
+| -------------- | -------------------------------------- | ----------------------------------------------------------------- |
 | `DATABASE_URL` | URL de conexão do PostgreSQL (Drizzle) | `postgresql://postgres:postgres@localhost:5433/solid_masterclass` |
 
 O `docker-compose.yml` sobe o PostgreSQL mapeando a porta do container (`5432`) para a porta `5433` do host — ajuste a porta em `DATABASE_URL` conforme o ambiente usado.
@@ -111,15 +111,15 @@ Cria um novo usuário. Valida senha e confirmação, unicidade de e-mail e canal
 
 **Corpo da requisição (JSON):**
 
-| Campo                       | Tipo     | Regras                                                                 |
-| ---------------------------- | -------- | ----------------------------------------------------------------------- |
-| `name`                        | `string` | mínimo 1 caractere (após `trim`)                                        |
-| `age`                          | `number` | inteiro, entre 18 e 100                                                 |
-| `phoneNumber`                | `string` | deve iniciar com `+55`, mínimo 1 caractere                              |
-| `email`                       | `string` | formato de e-mail válido                                                |
-| `password`                    | `string` | mínimo 8 caracteres                                                     |
-| `passwordConfirmation`      | `string` | mínimo 8 caracteres, deve ser igual a `password`                        |
-| `preferredMarketingChannel` | `string` | um de: `email`, `sms`, `push`, `whatsapp`                               |
+| Campo                       | Tipo     | Regras                                           |
+| --------------------------- | -------- | ------------------------------------------------ |
+| `name`                      | `string` | mínimo 1 caractere (após `trim`)                 |
+| `age`                       | `number` | inteiro, entre 18 e 100                          |
+| `phoneNumber`               | `string` | deve iniciar com `+55`, mínimo 1 caractere       |
+| `email`                     | `string` | formato de e-mail válido                         |
+| `password`                  | `string` | mínimo 8 caracteres                              |
+| `passwordConfirmation`      | `string` | mínimo 8 caracteres, deve ser igual a `password` |
+| `preferredMarketingChannel` | `string` | um de: `email`, `sms`, `push`, `whatsapp`        |
 
 **Exemplo de requisição:**
 
@@ -139,12 +139,12 @@ curl -X POST http://localhost:4949/users \
 
 **Respostas:**
 
-| Status | Quando ocorre                                                        | Corpo                                                                                          |
-| ------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `201`  | Usuário criado com sucesso                                             | `{ id, name, age, phoneNumber, email, preferredMarketingChannel }` (sem a senha)                 |
-| `400`  | Corpo inválido, senha e confirmação diferentes, ou canal inválido      | `{ "error": "Passwords do not match" }` ou `{ "error": "Invalid marketing preferred channel" }`  |
-| `409`  | E-mail já cadastrado                                                   | `{ "error": "E-mail já cadastrado" }`                                                            |
-| `500`  | Erro inesperado ao criar o usuário (ex.: violação de constraint no BD) | `{ "error": "Erro ao criar usuário" }`                                                            |
+| Status | Quando ocorre                                                          | Corpo                                                                                           |
+| ------ | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `201`  | Usuário criado com sucesso                                             | `{ id, name, age, phoneNumber, email, preferredMarketingChannel }` (sem a senha)                |
+| `400`  | Corpo inválido, senha e confirmação diferentes, ou canal inválido      | `{ "error": "Passwords do not match" }` ou `{ "error": "Invalid marketing preferred channel" }` |
+| `409`  | E-mail já cadastrado                                                   | `{ "error": "E-mail já cadastrado" }`                                                           |
+| `500`  | Erro inesperado ao criar o usuário (ex.: violação de constraint no BD) | `{ "error": "Erro ao criar usuário" }`                                                          |
 
 ## Testes
 
