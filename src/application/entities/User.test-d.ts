@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, it } from "vitest";
 
-import { type User } from "./User";
+import { type User } from "./User.js";
 
 describe("User", () => {
   it("requires the fields the interface already defines, with no invented validation", () => {
