@@ -26,7 +26,7 @@ Proof: `grep -A6 "## Análise prévia" AGENTS.md | grep -i "padrões existentes"
 Proof: `grep -i "dúvidas relevantes" AGENTS.md` e `grep -i "conflitos com decisões existentes" AGENTS.md`
 
 **C3** - `AGENTS.md` lista como executáveis sem confirmação adicional exatamente: `pnpm run lint`, `pnpm exec tsc --noEmit`, `pnpm test`, `pnpm run build`.
-Proof: `grep -c '`pnpm run lint`\|`pnpm exec tsc --noEmit`\|`pnpm test`\|`pnpm run build`' AGENTS.md` retorna as 4 ocorrências dentro da lista "sem confirmação"
+Proof: `sed -n '/Executáveis sem confirmação adicional/,/Exigem confirmação explícita/p' AGENTS.md | grep -c '`pnpm run lint`\|`pnpm exec tsc --noEmit`\|`pnpm test`\|`pnpm run build`'` retorna 4 - a seção isolada tem exatamente essas 4 ocorrências (a busca sem escopo no arquivo inteiro retorna 5, porque `pnpm test` também aparece em "Comandos de validação", fora da lista "sem confirmação")
 
 **C4** - `AGENTS.md` lista como exigindo confirmação explícita, no mínimo: instalação/alteração de dependências, `drizzle-kit migrate` fora do CI, alteração de arquivos de configuração (tsconfig.json, eslint.config.js, .prettierrc, workflows de CI, hooks do Husky), commits, push e qualquer operação destrutiva.
 Proof: `grep -i "pnpm add" AGENTS.md`, `grep -i "drizzle-kit migrate" AGENTS.md`, `grep -i "tsconfig.json" AGENTS.md`, `grep -i "husky" AGENTS.md`, `grep -i "operação destrutiva" AGENTS.md`
