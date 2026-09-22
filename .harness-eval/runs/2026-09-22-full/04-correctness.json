@@ -1,0 +1,114 @@
+[
+  {
+    "id": "A001",
+    "severity": "BROKEN",
+    "source": ".agents/skills/harness-eval/SKILL.md",
+    "claim": "Path cite `.agents/skills`",
+    "reality": "File does not exist (case-sensitive check)",
+    "evidence": "/Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/.agents/skills"
+  },
+  {
+    "id": "A002",
+    "severity": "BROKEN",
+    "source": ".agents/skills/harness-eval/SKILL.md",
+    "claim": "Path cite `.cursor/skills`",
+    "reality": "File does not exist (case-sensitive check)",
+    "evidence": "/Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.cursor/skills; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/.cursor/skills"
+  },
+  {
+    "id": "A003",
+    "severity": "BROKEN",
+    "source": ".agents/skills/harness-eval/SKILL.md",
+    "claim": "Path cite `lib/...`",
+    "reality": "File does not exist (case-sensitive check)",
+    "evidence": "/Users/britesh/dev/formacao-em-SOLID/solid-masterclass/lib/...; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/lib/..."
+  },
+  {
+    "id": "A004",
+    "severity": "BROKEN",
+    "source": ".agents/skills/harness-eval/SKILL.md",
+    "claim": "Path cite `test/...`",
+    "reality": "File does not exist (case-sensitive check)",
+    "evidence": "/Users/britesh/dev/formacao-em-SOLID/solid-masterclass/test/...; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/test/..."
+  },
+  {
+    "id": "A005",
+    "severity": "BROKEN",
+    "source": ".agents/skills/harness-eval/SKILL.md",
+    "claim": "Path cite `.agents/...`",
+    "reality": "File does not exist (case-sensitive check)",
+    "evidence": "/Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/...; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/.agents/..."
+  },
+  {
+    "id": "A007",
+    "severity": "BROKEN",
+    "source": ".agents/skills/harness-eval/SKILL.md",
+    "claim": "Path cite `.agents/\u2026`",
+    "reality": "File does not exist (case-sensitive check)",
+    "evidence": "/Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/\u2026; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/.agents/\u2026"
+  },
+  {
+    "id": "A008",
+    "severity": "BROKEN",
+    "source": ".agents/skills/harness-eval/references/PROTOCOL.md",
+    "claim": "Path cite `.agents/skills`",
+    "reality": "File does not exist (case-sensitive check)",
+    "evidence": "/Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/references/.agents/skills; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/.agents/skills"
+  },
+  {
+    "id": "A009",
+    "severity": "BROKEN",
+    "source": ".agents/skills/harness-eval/references/PROTOCOL.md",
+    "claim": "Path cite `.cursor/skills`",
+    "reality": "File does not exist (case-sensitive check)",
+    "evidence": "/Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.cursor/skills; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/references/.cursor/skills; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/.cursor/skills"
+  },
+  {
+    "id": "A010",
+    "severity": "BROKEN",
+    "source": ".agents/skills/harness-eval/references/PROTOCOL.md",
+    "claim": "Path cite `bin/console`",
+    "reality": "File does not exist (case-sensitive check)",
+    "evidence": "/Users/britesh/dev/formacao-em-SOLID/solid-masterclass/bin/console; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/references/bin/console; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/bin/console"
+  },
+  {
+    "id": "A011",
+    "severity": "BROKEN",
+    "source": ".agents/skills/harness-eval/references/PROTOCOL.md",
+    "claim": "Path cite `references/view.md`",
+    "reality": "File does not exist (case-sensitive check)",
+    "evidence": "/Users/britesh/dev/formacao-em-SOLID/solid-masterclass/references/view.md; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/references/references/view.md; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/harness-eval/references/view.md; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.cursor/skills/harness-eval/references/view.md"
+  },
+  {
+    "id": "A014",
+    "severity": "BROKEN",
+    "source": ".agents/skills/tlc-implement/references/verify.md",
+    "claim": "Path cite `bin/rails`",
+    "reality": "File does not exist (case-sensitive check)",
+    "evidence": "/Users/britesh/dev/formacao-em-SOLID/solid-masterclass/bin/rails; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/tlc-implement/references/bin/rails; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/tlc-implement/bin/rails"
+  },
+  {
+    "id": "A015",
+    "severity": "BROKEN",
+    "source": ".agents/skills/tlc-spec-driven/references/tasks.md",
+    "claim": "Command cite ``yarn test:unit``",
+    "reality": "Script/task `test:unit` not in discovered manifest scripts",
+    "evidence": "manifest_commands missing `test:unit`"
+  },
+  {
+    "id": "A016",
+    "severity": "BROKEN",
+    "source": ".agents/skills/tlc-spec-driven/references/tasks.md",
+    "claim": "Command cite ``yarn test:e2e``",
+    "reality": "Script/task `test:e2e` not in discovered manifest scripts",
+    "evidence": "manifest_commands missing `test:e2e`"
+  },
+  {
+    "id": "A017",
+    "severity": "BROKEN",
+    "source": ".agents/skills/tlc-spec-lean/references/verify.md",
+    "claim": "Path cite `bin/rails`",
+    "reality": "File does not exist (case-sensitive check)",
+    "evidence": "/Users/britesh/dev/formacao-em-SOLID/solid-masterclass/bin/rails; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/tlc-spec-lean/references/bin/rails; /Users/britesh/dev/formacao-em-SOLID/solid-masterclass/.agents/skills/tlc-spec-lean/bin/rails"
+  }
+]

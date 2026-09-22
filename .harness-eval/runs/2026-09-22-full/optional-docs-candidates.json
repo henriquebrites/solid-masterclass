@@ -1,0 +1,29 @@
+{
+  "policy": {
+    "agent_harness_refs": "always_include",
+    "adr_rfc_decision_records": "always_exclude",
+    "other_cited_docs": "opt_in_after_user_approval"
+  },
+  "excluded_decision_records": [],
+  "optional_by_type": {
+    ".github": [
+      ".github/workflows/ci.yml"
+    ],
+    "package.json": [
+      "package.json"
+    ],
+    "tsconfig.json": [
+      "tsconfig.json"
+    ]
+  },
+  "included_optional_docs": [
+    ".github/workflows/ci.yml",
+    "package.json",
+    "tsconfig.json"
+  ],
+  "included_doc_types": [
+    ".github",
+    "package.json",
+    "tsconfig.json"
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "root": "/Users/britesh/dev/formacao-em-SOLID/solid-masterclass",
+  "generated_at": "2026-09-22T01:21:03.402684+00:00",
+  "t0": [
+    ".cursor/rules/agents.mdc",
+    "AGENTS.md",
+    "CLAUDE.md"
+  ],
+  "t1": [
+    ".agents/skills/commit-message/SKILL.md",
+    ".agents/skills/github-readme-generator/SKILL.md",
+    ".agents/skills/harness-eval/SKILL.md",
+    ".agents/skills/the-judge/SKILL.md",
+    ".agents/skills/tlc-discover/SKILL.md",
+    ".agents/skills/tlc-implement/SKILL.md",
+    ".agents/skills/tlc-plan/SKILL.md",
+    ".agents/skills/tlc-spec-driven/SKILL.md",
+    ".agents/skills/tlc-spec-lean/SKILL.md"
+  ],
+  "t2": [
+    ".agents/skills/github-readme-generator/references/evidence-policy.md",
+    ".agents/skills/github-readme-generator/references/validation-checklist.md",
+    ".agents/skills/harness-eval/references/GLOSSARY.md",
+    ".agents/skills/harness-eval/references/PROTOCOL.md",
+    ".agents/skills/harness-eval/references/claims.schema.json",
+    ".agents/skills/harness-eval/references/judge-prompts.md",
+    ".agents/skills/the-judge/references/comment-voice.md",
+    ".agents/skills/the-judge/references/review-standards.md",
+    ".agents/skills/tlc-discover/references/document-format.md",
+    ".agents/skills/tlc-implement/references/checklist-format.md",
+    ".agents/skills/tlc-implement/references/screens.md",
+    ".agents/skills/tlc-implement/references/test-policy.md",
+    ".agents/skills/tlc-implement/references/verify.md",
+    ".agents/skills/tlc-plan/references/document-format.md",
+    ".agents/skills/tlc-spec-driven/references/code-analysis.md",
+    ".agents/skills/tlc-spec-driven/references/coding-principles.md",
+    ".agents/skills/tlc-spec-driven/references/context-limits.md",
+    ".agents/skills/tlc-spec-driven/references/design.md",
+    ".agents/skills/tlc-spec-driven/references/discuss.md",
+    ".agents/skills/tlc-spec-driven/references/implement.md",
+    ".agents/skills/tlc-spec-driven/references/lessons.md",
+    ".agents/skills/tlc-spec-driven/references/memory.md",
+    ".agents/skills/tlc-spec-driven/references/specify.md",
+    ".agents/skills/tlc-spec-driven/references/sub-agents.md",
+    ".agents/skills/tlc-spec-driven/references/tasks.md",
+    ".agents/skills/tlc-spec-driven/references/validate.md",
+    ".agents/skills/tlc-spec-lean/references/build.md",
+    ".agents/skills/tlc-spec-lean/references/checks.md",
+    ".agents/skills/tlc-spec-lean/references/memory.md",
+    ".agents/skills/tlc-spec-lean/references/plan.md",
+    ".agents/skills/tlc-spec-lean/references/verify.md",
+    ".github/workflows/ci.yml",
+    "package.json",
+    "tsconfig.json"
+  ],
+  "manifests": [
+    "package.json"
+  ],
+  "manifest_commands": [
+    "build",
+    "dev",
+    "test",
+    "start",
+    "lint",
+    "lint-fix",
+    "format",
+    "prepare"
+  ],
+  "doc_scope": {
+    "included_optional_docs": [
+      ".github/workflows/ci.yml",
+      "package.json",
+      "tsconfig.json"
+    ],
+    "included_doc_types": [
+      ".github",
+      "package.json",
+      "tsconfig.json"
+    ],
+    "excluded_decision_record_count": 0,
+    "optional_type_count": {
+      ".github": 1,
+      "package.json": 1,
+      "tsconfig.json": 1
+    }
+  }
+}
