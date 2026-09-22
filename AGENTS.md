@@ -86,6 +86,10 @@ Use os scripts já existentes em `package.json` para verificar conformidade — 
 - `pnpm format` — Prettier.
 - `pnpm test` — Vitest.
 - `pnpm build` — checagem de tipos e compilação TypeScript.
+- `pnpm run typecheck` — checagem de tipos isolada (`tsc --noEmit`), sem gerar `dist/`.
+- `pnpm run test:run` — Vitest em modo não interativo (usado em CI e no hook `pre-push`).
+- `pnpm run test:coverage` — Vitest com relatório de cobertura.
+- `pnpm run format:check` — Prettier em modo de verificação (`--check`), sem reescrever arquivos.
 
 ## Análise prévia e limites de autonomia
 
