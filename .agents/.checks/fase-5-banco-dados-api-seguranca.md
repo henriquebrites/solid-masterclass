@@ -33,6 +33,8 @@ Toca `src/drivers/app.ts`, `src/index.ts`, `src/resources/db/client.ts`, `packag
 | Novo arquivo de teste `UserRepository.integration.test.ts` (não reaproveita `UserRepository.test.ts`) | arquivo novo em `src/resources/repositories/`, sem `vi.mock("../db/client")`, usando o `db` real | estender `UserRepository.test.ts` - rejeitado: esse arquivo mocka `db` inteiramente no topo, incompatível com um teste que precisa do client real; decisão já registrada na tarefa 5.6 |
 | Validação de `DATABASE_URL` no boot via zod, falhando com mensagem explícita | schema zod validando `DATABASE_URL` como string não vazia, aplicado antes de `drizzle(...)` em `client.ts` | checagem manual (`if (!process.env.DATABASE_URL) throw ...`) - rejeitada porque zod já é dependência do projeto e a tarefa 5.3 pede explicitamente esse mecanismo |
 
+| Handlers de sinal/exceção do processo (5.2, 5.4) extraídos para `src/drivers/processLifecycle.ts`, exportando `registerProcessLifecycle(app, db)`, em vez de código solto em `src/index.ts` | novo arquivo `src/drivers/processLifecycle.ts`; `src/index.ts` chama `registerProcessLifecycle(app, db)` antes de `app.listen` | manter tudo inline em `src/index.ts` - rejeitado porque `index.ts` roda código de topo (`app.listen` real na porta 4949) ao ser importado, tornando `unhandledRejection`/`uncaughtException`/`SIGTERM`/`SIGINT` impossíveis de testar isoladamente sem subir um servidor real; extrair para um módulo puro e testável é reversível (é só um corte de função) mas fica registrado aqui porque introduz um arquivo novo não previsto em "Arquivos envolvidos" das tarefas 5.2/5.4 |
+
 - Nada além disso nesta mudança é difícil de reverter - handlers de processo (5.2), shutdown gracioso (5.4) e log de exceção (5.1) são todos aditivos e reversíveis por remoção de código, sem afetar dado persistido ou contrato observável.
 
 ## Test policy
@@ -60,13 +62,13 @@ Proof: `pnpm exec vitest run src/drivers/app.test.ts -t "logs the original error
 **C4** - O corpo da resposta 500 ao cliente continua exatamente `{ error: "Erro ao criar usuário" }`, sem vazar stack trace
 Proof: `pnpm exec vitest run src/drivers/app.test.ts -t "returns 500 when a DB constraint throws"`
 
-### S2 - Tratamento de exceções não capturadas no processo (5.2) · `src/index.ts` · ~1 KB · ~0.5k
+### S2 - Tratamento de exceções não capturadas no processo (5.2) · `src/drivers/processLifecycle.ts` (novo) · ~1 KB · ~0.5k
 
 **C5** - Um `unhandledRejection` é capturado e registrado via logger antes do encerramento do processo
-Proof: `pnpm exec vitest run src/index.test.ts -t "logs and exits on unhandledRejection"`
+Proof: `pnpm exec vitest run src/drivers/processLifecycle.test.ts -t "logs and exits on unhandledRejection"`
 
 **C6** - Uma exceção síncrona não capturada (`uncaughtException`) é capturada e registrada via logger antes do encerramento do processo
-Proof: `pnpm exec vitest run src/index.test.ts -t "logs and exits on uncaughtException"`
+Proof: `pnpm exec vitest run src/drivers/processLifecycle.test.ts -t "logs and exits on uncaughtException"`
 
 ### S3 - Validar DATABASE_URL no boot (5.3) · `src/resources/db/client.ts` · ~1 KB · ~0.5k
 
@@ -76,16 +78,16 @@ Proof: `pnpm exec vitest run src/resources/db/client.test.ts -t "throws an expli
 **C8** - Quando `DATABASE_URL` está definida como string não vazia, o boot prossegue sem alteração de comportamento observável
 Proof: `pnpm exec vitest run src/resources/db/client.test.ts -t "does not throw when DATABASE_URL is set"`
 
-### S4 - Graceful shutdown da conexão com o banco (5.4) · `src/index.ts`, `src/resources/db/client.ts` · ~1.5 KB · ~0.5k
+### S4 - Graceful shutdown da conexão com o banco (5.4) · `src/drivers/processLifecycle.ts`, `src/index.ts` · ~1.5 KB · ~0.5k
 
 **C9** - Ao receber `SIGTERM`, a conexão com o banco é fechada antes do processo encerrar
-Proof: `pnpm exec vitest run src/index.test.ts -t "closes the database connection on SIGTERM"`
+Proof: `pnpm exec vitest run src/drivers/processLifecycle.test.ts -t "closes the database connection on SIGTERM"`
 
 **C10** - Ao receber `SIGINT`, a conexão com o banco é fechada antes do processo encerrar
-Proof: `pnpm exec vitest run src/index.test.ts -t "closes the database connection on SIGINT"`
+Proof: `pnpm exec vitest run src/drivers/processLifecycle.test.ts -t "closes the database connection on SIGINT"`
 
 **C11** - Quando o fechamento da conexão falha, o erro é registrado via logger e o processo ainda assim encerra
-Proof: `pnpm exec vitest run src/index.test.ts -t "logs and still exits when closing the connection fails"`
+Proof: `pnpm exec vitest run src/drivers/processLifecycle.test.ts -t "logs and still exits when closing the connection fails"`
 
 ### S5 - Hardening HTTP: helmet, CORS, rate limit (5.5) · `src/drivers/app.ts`, `package.json` · ~2 KB · ~1k
 
