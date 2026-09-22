@@ -4,5 +4,10 @@ export default defineConfig({
   test: {
     include: ["src/**/*.test.ts"],
     exclude: ["node_modules", ".git", "dist"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "lcov"],
+      reportsDirectory: "coverage",
+    },
   },
 });
