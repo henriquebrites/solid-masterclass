@@ -27,8 +27,9 @@ Mantenha os arquivos auxiliares dos agentes em `.agents/`:
 | Artefatos auxiliares                        | `.agents/artifacts/`     |
 | Arquivos temporários                        | `.agents/tmp/`           |
 | Saídas do `harness-eval`                    | `.agents/.harness-eval/` |
+| Artefatos do `tlc-spec-lean`                | `.agents/.specs/`        |
 
-`.agents/.tasks/` e `.agents/.checks/` usam ponto porque são os nomes que as skills `tlc-plan` e `tlc-implement` já usam na prática (`.tasks/<name>.md` e `.checks/<feature>.md`) e que já existem no repositório. `.agents/.harness-eval/` usa ponto pelo mesmo motivo: é o nome que a skill `harness-eval` já usa por padrão (`.harness-eval/runs/<run-id>/`), apenas movido para dentro de `.agents/`. `.agents/plans/` e `.agents/reports/` já existem no repositório com conteúdo. Os demais diretórios (`research/`, `artifacts/`, `tmp/`) ainda não existem e devem ser criados sob demanda, sem ponto, quando a primeira tarefa que os usa surgir.
+`.agents/.tasks/` e `.agents/.checks/` usam ponto porque são os nomes que as skills `tlc-plan` e `tlc-implement` já usam na prática (`.tasks/<name>.md` e `.checks/<feature>.md`) e que já existem no repositório. `.agents/.harness-eval/` usa ponto pelo mesmo motivo: é o nome que a skill `harness-eval` já usa por padrão (`.harness-eval/runs/<run-id>/`), apenas movido para dentro de `.agents/`. `.agents/.specs/` segue o mesmo padrão para a skill `tlc-spec-lean`, que por padrão escreve em `.specs/features/<feature>/`; para gravar dentro de `.agents/`, passe `--root .agents` aos scripts `validate_plan.py`/`validate_checks.py`/`validate_verification.py` dessa skill. `.agents/plans/` e `.agents/reports/` já existem no repositório com conteúdo. Os demais diretórios (`research/`, `artifacts/`, `tmp/`) ainda não existem e devem ser criados sob demanda, sem ponto, quando a primeira tarefa que os usa surgir.
 
 Crie os diretórios necessários quando ainda não existirem.
 
